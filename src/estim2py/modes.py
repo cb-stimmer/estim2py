@@ -3,49 +3,49 @@ class Estim2pyMode:
 
     Construct with Estim2pyMode.get_mode(int).  That will return the relevant mode by integer id.
     """
-    
-    modes = {
-        0: { "name":"pulse",     "param_a": "pulse speed", "param_b": "pulse feel", "notes": "Pulsing on and off" },
-        1: { "name":"bounce",    "param_a": "pulse speed", "param_b": "pulse feel", "notes": "Pulsing alternatively" },
-        2: { "name":"continious","param_a": "pulse feel", "param_b": None,          "notes": "Both channels always on" },
-        3: { "name":"asplit",    "param_a": "pulse speed", "param_b": "pulse feel", "notes": "A Pulse B Continious" },
-        4: { "name":"bsplit",    "param_a": "pulse speed", "param_b": "pulse feel", "notes": "B Pulse A Continious" },
-        5: { "name":"wave",      "param_a": "speed of increase",            "param_b": "wave feel",   "notes": "Output increases to power, then to 0" },
-        6: { "name":"waterfall", "param_a": "speed of increase / decrease", "param_b": "waterfall feel", "notes": "Output to power, then back down" },
-        7: { "name":"squeeze",   "param_a": "pulse speed", "param_b": "feel", "notes": "Pulse rate increases and then drops to slow" },
-        8: { "name":"milk",      "param_a": "pulse speed", "param_b": "feel", "notes": "Pulse rate increases and then drops to slow, b channel alternates" },
-        9: { "name":"throb",     "param_a": "feel range", "param_b": None, "notes": "Continious, with the feel increasing to range and dropping to 0" },
-        10: { "name":"thrust",   "param_a": "feel range", "param_b": None, "notes": "Continious, with the feel increasing to range and decreasing" },
-        11: { "name":"random",   "param_a": "random range", "param_b": "pulse feel", "notes": "Random Levels" },
-        12: { "name":"step",     "param_a": "step delay", "param_b": "pulse feel", "notes": "Builds towards a power level slowly" },
-        13: { "name":"training", "param_a": "jump delay", "param_b": "pulse feel", "notes": "Jumps to the power level quickly" }
+
+    modes: dict[ int, tuple[str, str, str | None, str]] = {
+        0: ( "pulse",     "pulse speed", "pulse feel", "Pulsing on and off" ),
+        1: ( "bounce",    "pulse speed", "pulse feel", "Pulsing alternatively" ),
+        2: ( "continuous","pulse feel", None,          "Both channels always on" ),
+        3: ( "asplit",    "pulse speed", "pulse feel", "A Pulse B Continuous" ),
+        4: ( "bsplit",    "pulse speed", "pulse feel", "B Pulse A Continuous" ),
+        5: ( "wave",      "speed of increase",            "wave feel",   "Output increases to power, then to 0" ),
+        6: ( "waterfall", "speed of increase / decrease", "waterfall feel", "Output to power, then back down" ),
+        7: ( "squeeze",   "pulse speed", "feel", "Pulse rate increases and then drops to slow" ),
+        8: ( "milk",      "pulse speed", "feel", "Pulse rate increases and then drops to slow, b channel alternates" ),
+        9: ( "throb",     "feel range", None, "Continuous, with the feel increasing to range and dropping to 0" ),
+        10: ( "thrust",   "feel range", None, "Continuous, with the feel increasing to range and decreasing" ),
+        11: ( "random",   "random range", "pulse feel", "Random Levels" ),
+        12: ( "step",     "step delay", "pulse feel", "Builds towards a power level slowly" ),
+        13: ( "training", "jump delay", "pulse feel", "Jumps to the power level quickly" )
     }
     """List of modes that this class knows about. Access directly if you like!"""
     
-    def __init__(self, mid, name, param_a, param_b, notes):
-        self.mid = mid
+    def __init__(self, mid: int, name: str, param_a: str, param_b: str | None, notes: str):
+        self.mid: int  = mid
         """numeric id of the mode."""
-        self.name = name
+        self.name: str = name
         """Short name of the mode."""
-        self.param_a = param_a
+        self.param_a: str = param_a
         """What channel C modifies."""
-        self.param_b = param_b
+        self.param_b: str | None = param_b
         """What channel D modifies, or None if not applicable"""
-        self.notes = notes
+        self.notes: str = notes
         """A real short description of the mode."""
         
-    @staticmethod
-    def get_mode(mid):
+    @classmethod
+    def get_mode(cls, mid: int):
         """Returns the mode based on the integer id.""" 
         m = Estim2pyMode.modes[mid]
-        return Estim2pyMode(mid, m["name"], m["param_a"], m["param_b"], m["notes"])
+        return Estim2pyMode(mid, m[0], m[1], m[2], m[3])
 
     @classmethod
-    def id_names(__class__):
+    def id_names(cls) -> dict[int, str]:
         """returns a dictionary of {modeid: name, ...}
 
-        ie. {0: "pulse", 1: "bounce", ...}
+        i.e. {0: "pulse", 1: "bounce", ...}
         """ 
-        return {m: v['name'] for m, v in __class__.modes.items()}
+        return {id: m[0] for id, m in cls.modes.items() }
 
 

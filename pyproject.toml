@@ -1,4 +1,3 @@
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -8,12 +7,12 @@ name = "estim2py"
 description = "Simple OO based connection to the Estim 2B box over the serial port."
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "Public Domain"}
+license = { text = "Public Domain" }
 authors = [
     {name = "Sissy Becky", email = "sissybecky@gmail.com"}
 ]
 dependencies = [
-    "pyserial"
+    "pyserial>=3.5"
 ]
 dynamic = ["version"]
 
@@ -28,9 +27,12 @@ env-file = ".env"
 dependencies = [
     "pytest",
     "pytest-mock",
+    "pytest-timeout",
     "ruff",
     "sphinx",
-    "pyserial"
+    "pyserial>=3.5",
+    "basedpyright",
+    "mypy"
 ]
 
 [tool.hatch.envs.default.scripts]
@@ -51,8 +53,15 @@ packages = ["src/estim2py"]
 
 [tool.pytest.ini_options]
 log_cli = true
-log_cli_level = "INFO"
+log_cli_level = "DEBUG"
 log_cli_format = "%(relativeCreated).3f [%(levelname)s] %(message)s"
 markers = [
-	"hardware: box is plugged in."
+	"hardware: box is plugged in.",
+	"timing: run long and dangerous experiments. Mount your scratch submissive."
 ]
+
+[tool.basedpyright]
+reportUnnecessaryIsInstance = "hint"
+verboseOutput = true
+venvPath = "."
+venv = ".venv"

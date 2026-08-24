@@ -1,9 +1,17 @@
-import serial
+from typing import Literal
+
+import serial  # pyright: ignore[reportMissingModuleSource]
 import time
 import logging
+
 from .status import Estim2pyStatus
 
 logger = logging.getLogger(__name__)
+
+type ChannelName = str
+type ChannelVal = int
+
+#from serial.tools import list_ports
 
 class Estim2pyConnection():
     """
@@ -11,27 +19,31 @@ class Estim2pyConnection():
 
     All method calls will return an Estim2pyStatus object.
 
-    Note that the timeout and delay values chosen are somewhat arbitrary.
-    If you have any thoughts about what they should be, please get in touch!
+    A note about the delay.  This needs to be at least 0.034, as that is the amount of time it takes to send 33 bytes over the serial wire.
+    That doesn't necessarily give any time for the 2B to act.  0.10 (the default) is extremely safe. 
     
     args:
     device - the serial device to connect with.
 
     keywords:
     timeout - Serial timeout, sent straight to pyserial
-    delay - enforced delay.  May not be needed? If you're feeling spicy, set to 0 
+    delay - enforced delay.  This gives the 2b enough time to act, and then respond. 
+    do_flush - whether or not to flush input on status retrieval.   This is probably witchcraft and can be left as false.
     """
 
-    BAUD = 9600
-    BYTESIZE = serial.EIGHTBITS
-    PARITY = serial.PARITY_NONE
-    STOPBITS = serial.STOPBITS_ONE
+    BAUD: int = 9600
+    BYTESIZE: int = serial.EIGHTBITS
+    PARITY: str = serial.PARITY_NONE
+    STOPBITS: int = serial.STOPBITS_ONE
 
-    MODE_MAX = 100
+    MODE_MAX: int = 100
+
+    TERMINATION_CHAR: Literal[b"\n"] = b"\n" 
     
-    def __init__(self, device, timeout=2, delay=0.10):
-        self.delay = delay
-        self.serial = serial.Serial(
+    def __init__(self, device: str, timeout:float=2, delay:float=0.04, do_flush:bool=False) -> None:
+        self.delay: float = delay
+        self.do_flush: bool = do_flush
+        self.serial: serial.Serial = serial.Serial(
             device,
             self.BAUD,
             timeout  = timeout,
@@ -39,16 +51,21 @@ class Estim2pyConnection():
             parity   = self.PARITY,
             stopbits = self.STOPBITS)
         
-
-    def get_status(self, flush=True):
+    def __del__(self):
+        # I don't think there would be any more pending output, but lets be sure of that.
+        if hasattr(self, 'serial') and hasattr(self.serial, "flush"):
+            self.serial.flush()
+            self.serial.close()
+        
+    def get_status(self):
         """Returns a Estim2pyStatus object"""
-        # May not be needed https://stackoverflow.com/questions/61596242/pyserial-when-should-i-use-flush#61602365
-        if flush:  # "Fucking Voodoo Magic, Man"
-            self.serial.flushInput()
-            
+
+        # Through experimentation, it looks like the flush isn't needed.
+        # Certainly not on a get_status call.
+        # That handling needs to go into the lower level __send/__receive
         return self.__send("")
 
-    def set_to_status(self, to_status):
+    def set_to_status(self, to_status: Estim2pyStatus) -> bool:
         """Change all settings to the input status. Returns a success boolean.
 
         This will cowardly set the link to 0 before trying to send all the statuses
@@ -60,22 +77,23 @@ class Estim2pyConnection():
         returns:
         True if all parameters were set, false if there was a mismatch.
         """
-        self.set_mode(to_status.mode)
 
-        if to_status.high_power():
-            self.high()
+
+        if to_status.is_high_power():
+            _ = self.high()
         else:
-            self.low()
+            _ = self.low()
 
         logger.debug("Cowardly setting linked to 0 because of link bug.")
         to_status.linked = 0
         # if (to_status.linked == 0): self.unlink else: self.link
 
+        _ = self.set_mode(to_status.mode)
         
-        self.set_channel('a', to_status.get_channel('a'))
-        self.set_channel('b', to_status.get_channel('b'))
-        self.set_channel('c', to_status.get_channel('c'))
-        self.set_channel('d', to_status.get_channel('d'))
+        _ = self.set_channel('a', to_status.get_channel('a'))
+        _ = self.set_channel('b', to_status.get_channel('b'))
+        _ = self.set_channel('c', to_status.get_channel('c'))
+        _ = self.set_channel('d', to_status.get_channel('d'))
 
         current_status = self.get_status()
         result = current_status == to_status
@@ -85,7 +103,7 @@ class Estim2pyConnection():
         
         return result
         
-    def set_channel(self, channel, val):
+    def set_channel(self, channel: ChannelName, val: ChannelVal):
         """Set's the channel to value val.
 
         Will throw a ValueError if:
@@ -94,7 +112,7 @@ class Estim2pyConnection():
 
         args:
         channel (str): A or B for power channels, C for Speed, D for Feeling. (generally)
-        val (int): 1-100 for A or B, 2-200 for C, 1-100 for D
+        val (int): 1-100 for A or B, 2-100 for C, 1-100 for D
         
         returns:
         Estim2pyStatus
@@ -102,12 +120,29 @@ class Estim2pyConnection():
         channel = channel.upper()
         if channel not in ['A', 'B', 'C', 'D']: raise ValueError(f"channel argument must be A, B, C, D. was {channel!r}")
         if channel in ['A','B'] and (val > 100 or val < 0): raise ValueError(f"channel value out of range [0-100] was {val}")
+
         # More experimentation needed prolly
         if channel == 'C' and (val > 100 or val < 2): raise ValueError(f"channel value out of range [2-100] was {val}")
         if channel == 'D' and (val > 100 or val < 1): raise ValueError(f"channel value out of range [1-100] was {val}")
 
         return self.__send(channel+str(val))
 
+    def set_a(self, val: ChannelVal) -> Estim2pyStatus:
+        """ Set channel A to val"""
+        return self.set_channel("A", val)
+    
+    def set_b(self, val: ChannelVal) -> Estim2pyStatus:
+        """ Set channel B to val"""
+        return self.set_channel("B", val)
+      
+    def set_c(self, val: ChannelVal) -> Estim2pyStatus:
+        """ Set channel C to val"""
+        return self.set_channel("C", val)
+    
+    def set_d(self, val: ChannelVal) -> Estim2pyStatus:
+        """ Set channel D to val"""
+        return self.set_channel("D", val)
+    
     def reset(self):
         """Resets the box and returns Estim2pyStatus"""
         return self.__send("E")
@@ -132,7 +167,7 @@ class Estim2pyConnection():
         """Sets channels A and B to 0 and returns Estim2pyStatus"""
         return self.__send("K")
 
-    def set_mode(self, mode_num):
+    def set_mode(self, mode_num: int) -> Estim2pyStatus:
         """Sets the mode to the numbered mode and returns Estim2pyStatus.
 
         Doesn't accept arguments over 100.  Note that my box only accepts up to 13.
@@ -143,21 +178,27 @@ class Estim2pyConnection():
         """
         if (mode_num < 0 or mode_num > self.MODE_MAX): raise ValueError("invalid mode number")
         return self.__send("M"+str(mode_num))
-            
-    def __receive(self):
-        logger.debug(f"Sleeping for {self.delay}")
-        time.sleep(self.delay)
-
-        logger.debug("Getting all input until a \\n. If things are broken here, this is the problem.")
+    
+    def __receive(self) -> bytes:
+        logger.debug(f"Getting all input until a [{self.TERMINATION_CHAR}]. If things are broken here, this is the problem.")
         # May be different line ending on windows!  Or version?
 
-        input = self.serial.read_until(b"\n")
-        logger.info(f"Received: {input}")
+        input = self.serial.read_until(self.TERMINATION_CHAR)
+        logger.info(f"Received: {input.decode("ascii")}")
         return input
 
-    def __send(self, out):
+    def __send(self, out: str) -> Estim2pyStatus:
         command = out+"\r" # thank you STPIHKAL https://buttplug.io/stpihkal/protocols/estim-systems/
         logger.info(f"Sending command: {out}")
-        self.serial.write(command.encode())
-        # need a delay? between read and write? I don't know.
+
+        # kill the output buffer before sending
+        self.serial.reset_input_buffer()
+
+        self.serial.write(command.encode())  # pyright: ignore[reportUnusedCallResult]
+        self.serial.flush() # block until everything is written out... Required! https://www.pyserial.com/docs/writing-data#flush
+
+        # wait for delay before calling receive
+        logger.debug(f"Sleeping for: {self.delay}")
+        time.sleep(self.delay)
+        
         return Estim2pyStatus.from_binary(self.__receive())

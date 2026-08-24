@@ -27,8 +27,7 @@ def test_set_channel_lower_case(fake_2b_resp, mock_serial):
     con.set_channel("a",100)
         
 @pytest.mark.hardware
-def test_integration(reset_2b_resp):
-    con = Estim2pyConnection("/dev/ttyUSB1")
+def test_integration(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
     assert con.get_status() == Estim2pyStatus.from_binary(reset_2b_resp)
 
@@ -39,9 +38,15 @@ def test_integration(reset_2b_resp):
 
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
 
+@pytest.mark.xfail(reason="pyserial will continue to wait even if the read_until sequence is observed")
+@pytest.mark.timeout(1)
 @pytest.mark.hardware
-def test_integration_power_change_resets_a_b(reset_2b_resp):
-    con = Estim2pyConnection("/dev/ttyUSB1")
+def test_timeout(reset_2b_resp, hardware_port):
+    Estim2pyConnection(hardware_port, timeout=3)
+    assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
+    
+@pytest.mark.hardware
+def test_integration_power_change_resets_a_b(con, reset_2b_resp):
 
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
 
@@ -58,8 +63,7 @@ def test_integration_power_change_resets_a_b(reset_2b_resp):
 
 
 @pytest.mark.hardware
-def test_integration_kill(reset_2b_resp):
-    con = Estim2pyConnection("/dev/ttyUSB1")
+def test_integration_kill(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
     assert con.set_channel('A',100) == Estim2pyStatus.from_binary(b'666:200:0:100:100:0:L:0:2.106\n')
     assert con.set_channel('B',50) == Estim2pyStatus.from_binary(b'666:200:100:100:100:0:L:0:2.106\n')
@@ -69,19 +73,21 @@ def test_integration_kill(reset_2b_resp):
     
 @pytest.mark.hardware
 @pytest.mark.xfail(reason="Can't find mic or line mode, but may not be able to set.")
-def test_integration_modes_past_13(reset_2b_resp):
-    con = Estim2pyConnection("/dev/ttyUSB1")
+def test_integration_modes_past_13(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
     assert con.set_mode(14) == Estim2pyStatus.from_binary(b'666:0:0:100:100:14:L:0:2.106\n')
     assert con.set_mode(15) == Estim2pyStatus.from_binary(b'666:0:0:100:100:15:L:0:2.106\n')        
     
 @pytest.mark.hardware
 @pytest.mark.xfail(reason="For whatever reason, linking doesn't seem to work.")
-def test_integration_link_bug(reset_2b_resp):
-    con = Estim2pyConnection("/dev/ttyUSB1")
+def test_integration_link_bug(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
     assert con.link() == Estim2pyStatus.from_binary(b'666:0:0:100:100:0:L:1:2.106\n')
 
+@pytest.fixture
+def con(hardware_port):
+    return Estim2pyConnection(hardware_port)
+    
 @pytest.fixture
 def reset_2b_resp():
     return b'666:0:0:100:100:0:L:0:2.106\n'
@@ -90,10 +96,3 @@ def reset_2b_resp():
 def fake_2b_resp():
     return b'746:12:22:32:42:5:L:0:2.106\n'
 
-@pytest.fixture
-def mock_serial(mocker, fake_2b_resp):
-    mock_ser = mocker.patch('serial.Serial', autospec=True)
-    mock_instance = mock_ser.return_value
-    mock_instance.read_until.return_value = fake_2b_resp
-
-    return mock_ser

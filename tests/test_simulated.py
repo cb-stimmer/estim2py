@@ -2,13 +2,14 @@ import pytest
 from estim2py import Estim2pyStatus
 from estim2py import Estim2pyConnection
 from estim2py import Estim2pySimulatedConnection
+from estim2py import Estim2pyError
 
 def test_constructor(default_status):
     s = Estim2pySimulatedConnection()
     assert isinstance(s, Estim2pyConnection)
 
     assert s.get_status() == default_status
-        
+
 def test_set_and_get(driver, default_status, changed_status):
     assert driver.get_status() == default_status
     assert driver.change_all() == changed_status
@@ -33,6 +34,26 @@ def test_reset(driver, default_status, changed_status):
 def test_set_to_status(driver, default_status, changed_for_set_to_status):
     assert driver.target.get_status() == default_status
     assert driver.target.set_to_status(changed_for_set_to_status)
+
+def test_returns_fresh_statuses(driver, default_status, changed_for_set_to_status):
+    d: Estim2pyStatus = driver.target.get_status()
+    assert d == default_status
+
+    driver.target.set_to_status(changed_for_set_to_status)
+    c = driver.target.get_status()
+    assert d == default_status
+    assert c == changed_for_set_to_status
+
+    assert c != d
+
+def test_failture(driver, default_status):
+    assert not driver.target.error_on_next(False)
+    assert driver.target.get_status() == default_status
+
+    assert driver.target.error_on_next(True)
+    with pytest.raises(Estim2pyError) as exc:
+        driver.target.set_mode(5)
+        
     
 @pytest.fixture
 def default_status():
@@ -57,6 +78,10 @@ def changed_then_kill():
 @pytest.fixture
 def changed_for_set_to_status():
     return Estim2pyStatus.from_binary(b"320:2:4:8:24:5:H:0:0.0.1\n")
+
+@pytest.fixture
+def simulated():
+    return Estim2pySimulatedConnection()
 
 @pytest.fixture
 def driver():
