@@ -20,9 +20,16 @@ class Estim2pyMode:
         12: ( "step",     "step delay", "pulse feel", "Builds towards a power level slowly" ),
         13: ( "training", "jump delay", "pulse feel", "Jumps to the power level quickly" )
     }
-    """List of modes that this class knows about. Access directly if you like!"""
+    """Numeric dictionary of modes that this class knows about. Access directly if you like!
+    The key is the mode id, and the value is a tuple in the format of:
+    [0] - Name
+    [1] - Channel C name
+    [2] - Channel D name, or none if N/A
+    [3] - short description
+    """
     
     def __init__(self, mid: int, name: str, param_a: str, param_b: str | None, notes: str):
+        """Constructor.  Not normally meant to be called from Estim2pyMode.get_mode"""
         self.mid: int  = mid
         """numeric id of the mode."""
         self.name: str = name

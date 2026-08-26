@@ -109,19 +109,23 @@ class Estim2pyStatus:
     def __ne__(self, other: Any) -> bool:  # pyright: ignore[reportExplicitAny, reportAny]
         return not self.__eq__(other)
 
+    @override
     def __gt__(self, other: "Estim2pyStatus") -> bool:
         return isinstance(other, Estim2pyStatus) and \
             self.__power_level_greater(other) or self.__power_channels_greater(other)  
 
+    @override
     def __ge__(self, other: "Estim2pyStatus") -> bool:
         return isinstance(other, Estim2pyStatus) and \
             ((self.__power_level_greater(other) or self.__power_level_equal(other)) and self.__rest_of_params_equal(other)) or \
             ((self.__power_channels_greater(other) or self.__power_channels_equal(other)) and self.__rest_of_params_equal(other))
 
+    @override
     def __lt__(self, other: "Estim2pyStatus") -> bool:
         return isinstance(other, Estim2pyStatus) and \
             other.__power_level_greater(self) or other.__power_channels_greater(self)
-        
+
+    @override
     def __le__(self, other: "Estim2pyStatus") -> bool:
         return isinstance(other, Estim2pyStatus) and other.__ge__(self)
         
@@ -144,6 +148,7 @@ class Estim2pyStatus:
             (self.linked == other.linked)
 
     def changes(self, other: "Estim2PyStatus") -> None | tuple:
+        """ Returns a tuple of value-names that are different between two values"""
         if self == other:
             return None
 

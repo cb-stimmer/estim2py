@@ -7,12 +7,24 @@ from .__version__ import __version__
 
 import logging
 
+"""A set of classes for interacting with the Estim 2B Power box
+
+Classes:
+    Estim2pyConnection - Main class for speaking with the box
+    Estim2pySimulatedConnection - A pretend box, for testing and developing.  Doesn't require serial
+    Estim2pyStatus - A class representing a status returned from the 2B box
+    Esitm2pyMode - A class representing a mode, plus it's metadata
+
+Exception:
+    Estim2pyError - Encapsulates connection and status parsing errors
+"""
+
+
+"""
+Estim2py logs to the standard logger.
+
+It will log any parse errors, which can be handy when troubleshooting.
+INFO will be very chatty and tell you serial messages going back and forth
+DEBUG will get into the internals, which may be too much.
+"""
 logger = logging.getLogger(__name__)
-
-"""
-A simple but thorough interface to the Estim 2B box.
-
-Estim2pyConnection is the main Class you'll be interacting with.  You can use Estim2pySimulatedConnection for ... yanno... simulation.
-
-Each interaction with Estim2pyConnection will return a Estim2pyStatus to query the state of the box.  Access it's members directly for the direct results from the box, or use the methods for a more human interface.  When you ues get_mode it will return an Estim2pyMode object, which will have all the information for that mode. You can also get any mode from it.
-"""

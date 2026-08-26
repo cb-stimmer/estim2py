@@ -42,6 +42,7 @@ docs = [
   "sphinx-apidoc -o docs/source/ src/estim2py",
   "sphinx-build docs/source docs/build"
 ]
+docserve = "python -m http.server 8099 --directory docs/build"
 release = [
   "test",
   "hatch build",

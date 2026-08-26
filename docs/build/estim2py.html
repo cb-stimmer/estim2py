@@ -5,15 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>estim2py package &#8212; estim2py 0.2.1 documentation</title>
+    <title>estim2py package &#8212; estim2py 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=37f418d5"></script>
+    <script src="_static/documentation_options.js?v=e259d695"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -38,45 +39,65 @@
 </section>
 <section id="module-estim2py.connection">
 <span id="estim2py-connection-module"></span><h2>estim2py.connection module<a class="headerlink" href="#module-estim2py.connection" title="Link to this heading">¶</a></h2>
+<dl class="py type">
+<dt class="sig sig-object py" id="estim2py.connection.ChannelName">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">ChannelName</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#estim2py.connection.ChannelName" title="Link to this definition">¶</a></dt>
+<dd><p>Type used to refer to channel names: A B C D.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="estim2py.connection.ChannelVal">
+<span class="property"><span class="k"><span class="pre">type</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">ChannelVal</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#estim2py.connection.ChannelVal" title="Link to this definition">¶</a></dt>
+<dd><p>Type used to refer to a channel value: 0-100.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">Estim2pyConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">Estim2pyConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_flush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Connect to the Estim 2b box, and manage communication</p>
 <p>All method calls will return an Estim2pyStatus object.</p>
+<p>A note about the delay.  This needs to be at least 0.034, as that is the amount of time it takes to send 33 bytes over the serial wire.
+That doesn’t necessarily give any time for the 2B to act.  0.10 (the default) is extremely safe.</p>
 <p>args:
 device - the serial device to connect with.</p>
 <p>keywords:
 timeout - Serial timeout, sent straight to pyserial
-delay - enforced delay.  May not be needed? If you’re feeling spicy, set to 0</p>
+delay - enforced delay.  This gives the 2b enough time to act, and then respond.
+do_flush - whether or not to flush input on status retrieval.   This is probably witchcraft and can be left as false.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.BAUD">
-<span class="sig-name descname"><span class="pre">BAUD</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9600</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.BAUD" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BAUD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9600</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.BAUD" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.BYTESIZE">
-<span class="sig-name descname"><span class="pre">BYTESIZE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.BYTESIZE" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BYTESIZE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.BYTESIZE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.MODE_MAX">
-<span class="sig-name descname"><span class="pre">MODE_MAX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.MODE_MAX" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">MODE_MAX</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.MODE_MAX" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.PARITY">
-<span class="sig-name descname"><span class="pre">PARITY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'N'</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.PARITY" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PARITY</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'N'</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.PARITY" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.STOPBITS">
-<span class="sig-name descname"><span class="pre">STOPBITS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.STOPBITS" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">STOPBITS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.STOPBITS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.TERMINATION_CHAR">
+<span class="sig-name descname"><span class="pre">TERMINATION_CHAR</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">b'\n'</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">b'\n'</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.TERMINATION_CHAR" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.get_status">
-<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flush</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.get_status" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.get_status" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a Estim2pyStatus object</p>
 </dd></dl>
 
@@ -111,27 +132,63 @@ delay - enforced delay.  May not be needed? If you’re feeling spicy, set to 0<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_a">
+<span class="sig-name descname"><span class="pre">set_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_a" title="Link to this definition">¶</a></dt>
+<dd><p>Set channel A to val</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_b">
+<span class="sig-name descname"><span class="pre">set_b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_b" title="Link to this definition">¶</a></dt>
+<dd><p>Set channel B to val</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_c">
+<span class="sig-name descname"><span class="pre">set_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_c" title="Link to this definition">¶</a></dt>
+<dd><p>Set channel C to val</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_channel">
-<span class="sig-name descname"><span class="pre">set_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_channel" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelName" title="estim2py.connection.ChannelName"><span class="pre">ChannelName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_channel" title="Link to this definition">¶</a></dt>
 <dd><p>Set’s the channel to value val.</p>
 <p>Will throw a ValueError if:
 The channel is not a,b,c or d (upper or lowercase)
 The val is notan integer between 0-100 for A and B, 2-100 for C, or 1-100 for D</p>
 <p>args:
 channel (str): A or B for power channels, C for Speed, D for Feeling. (generally)
-val (int): 1-100 for A or B, 2-200 for C, 1-100 for D</p>
+val (int): 1-100 for A or B, 2-100 for C, 1-100 for D</p>
 <p>returns:
 Estim2pyStatus</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_d">
+<span class="sig-name descname"><span class="pre">set_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_d" title="Link to this definition">¶</a></dt>
+<dd><p>Set channel D to val</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_mode">
-<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_mode" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Sets the mode to the numbered mode and returns Estim2pyStatus.</p>
 <p>Doesn’t accept arguments over 100.  Note that my box only accepts up to 13.
 (I might need an update.)</p>
 <p>args:
 mode_num (int): mode number to set to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_to_status">
+<span class="sig-name descname"><span class="pre">set_to_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_to_status" title="Link to this definition">¶</a></dt>
+<dd><p>Change all settings to the input status. Returns a success boolean.</p>
+<p>This will cowardly set the link to 0 before trying to send all the statuses
+Until I figure out what is wrong with channel link.</p>
+<p>args:
+to_status (Estim2pyStatus): target status.</p>
+<p>returns:
+True if all parameters were set, false if there was a mismatch.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -143,60 +200,69 @@ mode_num (int): mode number to set to.</p>
 </dd></dl>
 
 </section>
+<section id="module-estim2py.exceptions">
+<span id="estim2py-exceptions-module"></span><h2>estim2py.exceptions module<a class="headerlink" href="#module-estim2py.exceptions" title="Link to this heading">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="estim2py.exceptions.Estim2pyError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.exceptions.</span></span><span class="sig-name descname"><span class="pre">Estim2pyError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.exceptions.Estim2pyError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</section>
 <section id="module-estim2py.modes">
 <span id="estim2py-modes-module"></span><h2>estim2py.modes module<a class="headerlink" href="#module-estim2py.modes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.modes.</span></span><span class="sig-name descname"><span class="pre">Estim2pyMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.modes.</span></span><span class="sig-name descname"><span class="pre">Estim2pyMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class representing a mode for the Estim 2b.</p>
 <p>Construct with Estim2pyMode.get_mode(int).  That will return the relevant mode by integer id.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.get_mode">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.get_mode" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.get_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the mode based on the integer id.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.id_names">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">id_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.id_names" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">id_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.id_names" title="Link to this definition">¶</a></dt>
 <dd><p>returns a dictionary of {modeid: name, …}</p>
-<p>ie. {0: “pulse”, 1: “bounce”, …}</p>
+<p>i.e. {0: “pulse”, 1: “bounce”, …}</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.mid">
-<span class="sig-name descname"><span class="pre">mid</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.mid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">mid</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.mid" title="Link to this definition">¶</a></dt>
 <dd><p>numeric id of the mode.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.modes">
-<span class="sig-name descname"><span class="pre">modes</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">{'name':</span> <span class="pre">'pulse',</span> <span class="pre">'notes':</span> <span class="pre">'Pulsing</span> <span class="pre">on</span> <span class="pre">and</span> <span class="pre">off',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">1:</span> <span class="pre">{'name':</span> <span class="pre">'bounce',</span> <span class="pre">'notes':</span> <span class="pre">'Pulsing</span> <span class="pre">alternatively',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">2:</span> <span class="pre">{'name':</span> <span class="pre">'continious',</span> <span class="pre">'notes':</span> <span class="pre">'Both</span> <span class="pre">channels</span> <span class="pre">always</span> <span class="pre">on',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'param_b':</span> <span class="pre">None},</span> <span class="pre">3:</span> <span class="pre">{'name':</span> <span class="pre">'asplit',</span> <span class="pre">'notes':</span> <span class="pre">'A</span> <span class="pre">Pulse</span> <span class="pre">B</span> <span class="pre">Continious',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">4:</span> <span class="pre">{'name':</span> <span class="pre">'bsplit',</span> <span class="pre">'notes':</span> <span class="pre">'B</span> <span class="pre">Pulse</span> <span class="pre">A</span> <span class="pre">Continious',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">5:</span> <span class="pre">{'name':</span> <span class="pre">'wave',</span> <span class="pre">'notes':</span> <span class="pre">'Output</span> <span class="pre">increases</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">to</span> <span class="pre">0',</span> <span class="pre">'param_a':</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase',</span> <span class="pre">'param_b':</span> <span class="pre">'wave</span> <span class="pre">feel'},</span> <span class="pre">6:</span> <span class="pre">{'name':</span> <span class="pre">'waterfall',</span> <span class="pre">'notes':</span> <span class="pre">'Output</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">back</span> <span class="pre">down',</span> <span class="pre">'param_a':</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase</span> <span class="pre">/</span> <span class="pre">decrease',</span> <span class="pre">'param_b':</span> <span class="pre">'waterfall</span> <span class="pre">feel'},</span> <span class="pre">7:</span> <span class="pre">{'name':</span> <span class="pre">'squeeze',</span> <span class="pre">'notes':</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'feel'},</span> <span class="pre">8:</span> <span class="pre">{'name':</span> <span class="pre">'milk',</span> <span class="pre">'notes':</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow,</span> <span class="pre">b</span> <span class="pre">channel</span> <span class="pre">alternates',</span> <span class="pre">'param_a':</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'param_b':</span> <span class="pre">'feel'},</span> <span class="pre">9:</span> <span class="pre">{'name':</span> <span class="pre">'throb',</span> <span class="pre">'notes':</span> <span class="pre">'Continious,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">dropping</span> <span class="pre">to</span> <span class="pre">0',</span> <span class="pre">'param_a':</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">'param_b':</span> <span class="pre">None},</span> <span class="pre">10:</span> <span class="pre">{'name':</span> <span class="pre">'thrust',</span> <span class="pre">'notes':</span> <span class="pre">'Continious,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">decreasing',</span> <span class="pre">'param_a':</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">'param_b':</span> <span class="pre">None},</span> <span class="pre">11:</span> <span class="pre">{'name':</span> <span class="pre">'random',</span> <span class="pre">'notes':</span> <span class="pre">'Random</span> <span class="pre">Levels',</span> <span class="pre">'param_a':</span> <span class="pre">'random</span> <span class="pre">range',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">12:</span> <span class="pre">{'name':</span> <span class="pre">'step',</span> <span class="pre">'notes':</span> <span class="pre">'Builds</span> <span class="pre">towards</span> <span class="pre">a</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">slowly',</span> <span class="pre">'param_a':</span> <span class="pre">'step</span> <span class="pre">delay',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'},</span> <span class="pre">13:</span> <span class="pre">{'name':</span> <span class="pre">'training',</span> <span class="pre">'notes':</span> <span class="pre">'Jumps</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">quickly',</span> <span class="pre">'param_a':</span> <span class="pre">'jump</span> <span class="pre">delay',</span> <span class="pre">'param_b':</span> <span class="pre">'pulse</span> <span class="pre">feel'}}</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.modes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">('pulse',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Pulsing</span> <span class="pre">on</span> <span class="pre">and</span> <span class="pre">off'),</span> <span class="pre">1:</span> <span class="pre">('bounce',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Pulsing</span> <span class="pre">alternatively'),</span> <span class="pre">2:</span> <span class="pre">('continuous',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">None,</span> <span class="pre">'Both</span> <span class="pre">channels</span> <span class="pre">always</span> <span class="pre">on'),</span> <span class="pre">3:</span> <span class="pre">('asplit',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'A</span> <span class="pre">Pulse</span> <span class="pre">B</span> <span class="pre">Continuous'),</span> <span class="pre">4:</span> <span class="pre">('bsplit',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'B</span> <span class="pre">Pulse</span> <span class="pre">A</span> <span class="pre">Continuous'),</span> <span class="pre">5:</span> <span class="pre">('wave',</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase',</span> <span class="pre">'wave</span> <span class="pre">feel',</span> <span class="pre">'Output</span> <span class="pre">increases</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">to</span> <span class="pre">0'),</span> <span class="pre">6:</span> <span class="pre">('waterfall',</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase</span> <span class="pre">/</span> <span class="pre">decrease',</span> <span class="pre">'waterfall</span> <span class="pre">feel',</span> <span class="pre">'Output</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">back</span> <span class="pre">down'),</span> <span class="pre">7:</span> <span class="pre">('squeeze',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'feel',</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow'),</span> <span class="pre">8:</span> <span class="pre">('milk',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'feel',</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow,</span> <span class="pre">b</span> <span class="pre">channel</span> <span class="pre">alternates'),</span> <span class="pre">9:</span> <span class="pre">('throb',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">dropping</span> <span class="pre">to</span> <span class="pre">0'),</span> <span class="pre">10:</span> <span class="pre">('thrust',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">decreasing'),</span> <span class="pre">11:</span> <span class="pre">('random',</span> <span class="pre">'random</span> <span class="pre">range',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Random</span> <span class="pre">Levels'),</span> <span class="pre">12:</span> <span class="pre">('step',</span> <span class="pre">'step</span> <span class="pre">delay',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Builds</span> <span class="pre">towards</span> <span class="pre">a</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">slowly'),</span> <span class="pre">13:</span> <span class="pre">('training',</span> <span class="pre">'jump</span> <span class="pre">delay',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Jumps</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">quickly')}</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.modes" title="Link to this definition">¶</a></dt>
 <dd><p>List of modes that this class knows about. Access directly if you like!</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.name" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.name" title="Link to this definition">¶</a></dt>
 <dd><p>Short name of the mode.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.notes">
-<span class="sig-name descname"><span class="pre">notes</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.notes" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">notes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.notes" title="Link to this definition">¶</a></dt>
 <dd><p>A real short description of the mode.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.param_a">
-<span class="sig-name descname"><span class="pre">param_a</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.param_a" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_a</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.param_a" title="Link to this definition">¶</a></dt>
 <dd><p>What channel C modifies.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.param_b">
-<span class="sig-name descname"><span class="pre">param_b</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.param_b" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">param_b</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.param_b" title="Link to this definition">¶</a></dt>
 <dd><p>What channel D modifies, or None if not applicable</p>
 </dd></dl>
 
@@ -213,6 +279,14 @@ mode_num (int): mode number to set to.</p>
 It should behave exactly like the real box.</p>
 <p>If it doesn’t… that’s a bug!</p>
 <p>The interface is exactly like Estim2pyConnection.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.error_on_next">
+<span class="sig-name descname"><span class="pre">error_on_next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">do_throw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.error_on_next" title="Link to this definition">¶</a></dt>
+<dd><p>Simulate an error on the next command.</p>
+<p>Error will only happen once.  After that normal behavior will continue.
+You can send it False to not error on the next command.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.get_status">
 <span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.get_status" title="Link to this definition">¶</a></dt>
@@ -264,7 +338,7 @@ The channel is not a,b,c or d (upper or lowercase)
 The val is notan integer between 0-100 for A and B, 2-100 for C, or 1-100 for D</p>
 <p>args:
 channel (str): A or B for power channels, C for Speed, D for Feeling. (generally)
-val (int): 1-100 for A or B, 2-200 for C, 1-100 for D</p>
+val (int): 1-100 for A or B, 2-100 for C, 1-100 for D</p>
 <p>returns:
 Estim2pyStatus</p>
 </dd></dl>
@@ -280,6 +354,11 @@ mode_num (int): mode number to set to.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.simulate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.unlink">
 <span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.unlink" title="Link to this definition">¶</a></dt>
 <dd><p>Enable’s link mode and returns Estim2pyStatus.  Note, does not work on my box!</p>
@@ -292,64 +371,90 @@ mode_num (int): mode number to set to.</p>
 <span id="estim2py-status-module"></span><h2>estim2py.status module<a class="headerlink" href="#module-estim2py.status" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.status.</span></span><span class="sig-name descname"><span class="pre">Estim2pyStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battery</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.status.</span></span><span class="sig-name descname"><span class="pre">Estim2pyStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An object that reports back the status of the Estim Box.</p>
 <p>Object members are direct from the serial port.  Object methods relate closer to what the box displays and return useful python objects.</p>
 <p>i.e. status.a will return 200 at max power, but get_channel(‘a’) will return 100.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.as_items">
-<span class="sig-name descname"><span class="pre">as_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.as_items" title="Link to this definition">¶</a></dt>
-<dd><p>Returns an items-like represtation of the status.</p>
+<span class="sig-name descname"><span class="pre">as_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.as_items" title="Link to this definition">¶</a></dt>
+<dd><p>Returns an items-like representation of the status.</p>
 <p>It’s ‘items-like’ in that you can use it for iteration, but modifying
 the values of the tuples inside the dictionary does nothing.</p>
 <p>NOTE, this is the raw values from the serial port.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.changes">
+<span class="sig-name descname"><span class="pre">changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Estim2PyStatus</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.changes" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a tuple of value-names that are different between two values</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.from_binary">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.from_binary" title="Link to this definition">¶</a></dt>
-<dd><p>Return an Estim2pyStatus object form a binary string.</p>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.from_binary" title="Link to this definition">¶</a></dt>
+<dd><p>Return an Estim2pyStatus object from bytes.</p>
 <p>This is mostly internal, but may be useful in some circumstances.  Check unit tests.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_a">
+<span class="sig-name descname"><span class="pre">get_a</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_a" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_b">
+<span class="sig-name descname"><span class="pre">get_b</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_b" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_c">
+<span class="sig-name descname"><span class="pre">get_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_c" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_channel">
-<span class="sig-name descname"><span class="pre">get_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_channel" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the value of the channel as reported by the box.</p>
+<span class="sig-name descname"><span class="pre">get_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_channel" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the value of the channel as reported by UI on the box.</p>
 <p>Channel must be a,b,c or d (upper or lower).
-The value is half of what’s reported on the serial port, and is what is displayed on the LCD.</p>
+The value is what is displayed on the LCD, which is half of that reported on the serial port.</p>
 <p>This value is compatible with Estim2pyConnection.set_channel().</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_d">
+<span class="sig-name descname"><span class="pre">get_d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_d" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_mode">
-<span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_mode" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.modes.Estim2pyMode" title="estim2py.modes.Estim2pyMode"><span class="pre">Estim2pyMode</span></a></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Returns an Estim2pyMode representing the current mode.</p>
 <p>See Estim2pyMode for more information.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.high_power">
-<span class="sig-name descname"><span class="pre">high_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.high_power" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.is_high_power">
+<span class="sig-name descname"><span class="pre">is_high_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.is_high_power" title="Link to this definition">¶</a></dt>
 <dd><p>Returns True if the box is in high power mode, False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.linked">
-<span class="sig-name descname"><span class="pre">linked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.linked" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.is_linked">
+<span class="sig-name descname"><span class="pre">is_linked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.is_linked" title="Link to this definition">¶</a></dt>
 <dd><p>Return True if the box is in linked mode, False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.low_power">
-<span class="sig-name descname"><span class="pre">low_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.low_power" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.is_low_power">
+<span class="sig-name descname"><span class="pre">is_low_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.is_low_power" title="Link to this definition">¶</a></dt>
 <dd><p>Returns True if the box is in low power mode, False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.unlinked">
-<span class="sig-name descname"><span class="pre">unlinked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.unlinked" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.is_unlinked">
+<span class="sig-name descname"><span class="pre">is_unlinked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.is_unlinked" title="Link to this definition">¶</a></dt>
 <dd><p>Returns True if the box is in unlinked mode, False otherwise.</p>
 </dd></dl>
 
@@ -387,11 +492,106 @@ The value is half of what’s reported on the serial port, and is what is displa
     </div>
 </search>
 <script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#installing">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#api-quick-ref">API Quick Ref</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#misc">Misc</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">estim2py package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.connection">estim2py.connection module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.connection.ChannelName"><code class="docutils literal notranslate"><span class="pre">ChannelName</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.connection.ChannelVal"><code class="docutils literal notranslate"><span class="pre">ChannelVal</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.BAUD"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.BAUD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.BYTESIZE"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.BYTESIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.MODE_MAX"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.MODE_MAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.PARITY"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.PARITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.STOPBITS"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.STOPBITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.TERMINATION_CHAR"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.TERMINATION_CHAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.get_status"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.get_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.high"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.kill"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.kill()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.link"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.link()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.low"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.reset"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_a()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_c"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_c()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_channel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_d"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_to_status"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_to_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.unlink"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.unlink()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.exceptions">estim2py.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.exceptions.Estim2pyError"><code class="docutils literal notranslate"><span class="pre">Estim2pyError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.modes">estim2py.modes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.modes.Estim2pyMode"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.get_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.get_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.id_names"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.id_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.mid"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.mid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.modes"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.name"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.notes"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.notes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.param_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.param_a</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.param_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.param_b</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.simulated">estim2py.simulated module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.error_on_next"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.error_on_next()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.get_status"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.get_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.high"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.high()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.kill"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.kill()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.link"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.link()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.low"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.low()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.reset"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.reset_status"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.reset_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.set_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.set_channel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.set_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.set_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.simulate"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.simulate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.unlink"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.unlink()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.status">estim2py.status module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.status.Estim2pyStatus"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.as_items"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.as_items()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.changes"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.changes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.from_binary"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.from_binary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_a()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_c"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_c()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_channel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_d"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_high_power"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_high_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_linked"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_linked()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_low_power"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_low_power()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_unlinked"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_unlinked()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py">Module contents</a></li>
+</ul>
+</li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
   </ul></li>
 </ul>
 </div>

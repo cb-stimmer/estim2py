@@ -9,7 +9,10 @@ from .status import Estim2pyStatus
 logger = logging.getLogger(__name__)
 
 type ChannelName = str
+"""Type used to refer to channel names: A B C D."""
+
 type ChannelVal = int
+"""Type used to refer to a channel value: 0-100."""
 
 #from serial.tools import list_ports
 

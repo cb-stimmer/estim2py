@@ -12,6 +12,14 @@ estim2py.connection module
    :show-inheritance:
    :undoc-members:
 
+estim2py.exceptions module
+--------------------------
+
+.. automodule:: estim2py.exceptions
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 estim2py.modes module
 ---------------------
 

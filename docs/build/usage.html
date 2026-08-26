@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Usage &#8212; estim2py 0.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=e259d695"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Contents" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
+<section id="what">
+<h2>What<a class="headerlink" href="#what" title="Link to this heading">¶</a></h2>
+<p>This is a python library to interact with the Estim 2B box.  It does nothing special, but it aims to be an easy to use building block for a bigger system.  I’ve tried my best to make it a modern python library that’s easy to use.</p>
+<p>But the best I can do in python is baby babble.</p>
+</section>
+<section id="version">
+<h2>Version<a class="headerlink" href="#version" title="Link to this heading">¶</a></h2>
+<p>I’m at the alpha oh-gosh I hope it works stage.</p>
+<p>Pronunciation</p>
+<p>It’s pronounced “ee stihm twoo pee”.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<p>Free use—I mean—Public Domain. I can’t in good conscious really copyright this.  See the references section below.</p>
+</section>
+</section>
+<section id="installing">
+<h1>Installing<a class="headerlink" href="#installing" title="Link to this heading">¶</a></h1>
+<p>Probably something like this, especially if you are using virtual environments.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>venv/bin/pip install estim2py</p>
+</dd>
+</dl>
+</section>
+<section id="api-quick-ref">
+<h1>API Quick Ref<a class="headerlink" href="#api-quick-ref" title="Link to this heading">¶</a></h1>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
+<dl>
+<dt>::</dt><dd><p>connection = Estim2pyConnection(“/serial/device”) # /dev/ttyUSBx on linux</p>
+<p>connection.set_channel(‘A’,20) # Set’s power level of channel a to 20
+connection.set_channel(‘B’,30) # Set’s power level of channel b to 30
+conneciton.set_channel(‘C’,10) # Sets the first parameter, usually speed, to 10
+connection.set_channel(‘D’,50) # Sets the secoond parameeter, usually feeling, to 50</p>
+</dd>
+</dl>
+<p>That’s the basics of it.  Estim2pyConnection is an object that you use to speak to the box.</p>
+</section>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Link to this heading">¶</a></h2>
+<p>Every response it returns is an Estim2pyStatus object that you can use to query the current status of the box.  You can also call <cite>get_status()</cite> at any time.</p>
+<dl>
+<dt>::</dt><dd><p>s = connection.get_status()  # -&gt; Estim2pyStatus
+# s = connection.set_channel(‘A’,20) # this would work too!</p>
+<p>print(f” Battery: is {s.battery}, A:{s.a},B:{s.b},C:{s.c},D:{s.d=},Mode:{s.mode=},Power:{s.power=},Linked:{s.linked=},FW Version:{s.version})”)
+# Battery: is 474, A:4,B:60,C:20,D:100,Mode:0,Power:L,Linked:0,FW Version:2.06</p>
+</dd>
+</dl>
+<p>Those are the values right from the box.</p>
+<p>I’ve provided a bunch of methods for ease of use.  In particular channels are set by a number between 0-100, but are reported as a number between 0-200.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>s.get_scaled_level(‘A’)  #-&gt; would return “20”, so scaled to what you see on the display of the box, while the underlying serial protocol said “40”.
+s.high_power() # -&gt; bool
+s.low_power() # -&gt; bool
+s.linked() # -&gt; bool
+s.unlinked() # -&gt; …. guess</p>
+</dd>
+</dl>
+<p>You can test Status’s for equality, and it will do the right thing!  Two status’s are considered equal if all of the parameters are equal (A,B,C,D,Mode,Power,Linked) while ignoring information like version or battery level.</p>
+</section>
+<section id="get-mode-details">
+<h2>Get Mode Details<a class="headerlink" href="#get-mode-details" title="Link to this heading">¶</a></h2>
+<p><cite>s.get_mode()</cite> returns a Estim2pyMode object, it’s a simple object that will return all the information about the current mode.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>m = s.get_mode()
+print(f”Mode [{m.mid}] {m.name} Param 1: {m.param_a} Param 2: {m.param_b} Notes: {m.notes}”)</p>
+</dd>
+</dl>
+<p>I know param_a and param_b are bad names. Sorry.  Submit a bug report if it… uhh… bugs you.</p>
+<p>Right now if the mode only has 1 param, then the other returns none.  I recall reading that in instances where only one param is avaiable to the mode then only ‘C’ is used.  But I have yet to test it.</p>
+<p>Modes don’t have a good equality test.  Just use <cite>status.mode</cite>.  It’s a number.</p>
+<p>You can get details of a mode by number too.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>m = Estim2pyMode.get_mode(0)</p>
+</dd>
+</dl>
+<p>Or get a dictionary of mode id and it’s name.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>modes = Estim2pyMode.id_names()
+print(modes[5]) # -&gt; outputs “milk”</p>
+</dd>
+</dl>
+</section>
+<section id="more-commands">
+<h2>More commands<a class="headerlink" href="#more-commands" title="Link to this heading">¶</a></h2>
+<p>OH, you can do other things with the connection too!</p>
+<dl>
+<dt>::</dt><dd><p>connection.high() # go into high power mode
+connection.low() # go into low power mode</p>
+<p>connection.reset() # Reset everything, set power to 0
+connection.kill() # Set power to 0, keep all other parameters</p>
+</dd>
+</dl>
+<p>And you can use these, but they are BROKEN</p>
+<dl class="simple">
+<dt>::</dt><dd><p># these are implemented, but don’t work! I don’t know why.
+connection.link()   # Link channels, if … yanno…
+connection.unlink() # might actually work! Who knows?</p>
+</dd>
+</dl>
+<p>Check the test in <cite>test_connection.py</cite> with the <cite>&#64;pytest.mark.hardware</cite> tag for more examples.</p>
+</section>
+</section>
+<section id="misc">
+<h1>Misc<a class="headerlink" href="#misc" title="Link to this heading">¶</a></h1>
+<section id="ethos">
+<h2>Ethos<a class="headerlink" href="#ethos" title="Link to this heading">¶</a></h2>
+<p>Small little objects that do the right thing and get out of the way.</p>
+<p>Abstract out the low level protocol nicely, so that you can build a higher level on top of it easier.  You still have to be aware of the gory details, switching modes or power H/L will kill the values of A/B (and C/D).</p>
+<p>For that matter, we still refer to “C” and “D”.</p>
+<p>But, with this library, you can be sure about what’s going into and out of the box.  That way you can build something cooler.</p>
+<p>(That is, assuming I got a few of the details right.  Like that damn channel link!)</p>
+</section>
+<section id="todo">
+<h2>Todo<a class="headerlink" href="#todo" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Find a test subject to test it on win/mac.</p></li>
+<li><p>Iron out clunky bits of the API.</p></li>
+<li><p>Automagickally select the right serial port.  Will take futzing.  I don’t realistically have access to a windows device.</p></li>
+<li><p>Maybe a DSL for scripting a bunch of actions together?  I am not sure.  That’s going against the ethos.  If I can do it in a tight way, maybe.</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<p>There are a few different Python Estim Implementations and You should know about STPIHKAL.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/fredhatt/estim2bapi">Estim2bapi</a> My primary source.  I was using this as my library, but the error handling dind’t work for me.</p></li>
+<li><p><a class="reference external" href="https://buttplug.io/stpihkal/protocols/estim-systems/">STPIHKAL</a> An amazing resource.</p></li>
+<li><p><a class="reference external" href="https://github.com/cornertime/2b">cornertime/2b</a> A pretty good implementation, but I needed something different.</p></li>
+<li><p><a class="reference external" href="https://github.com/cb-stimmer/chaturbate-estim-2b">ChaturbEase E-stim</a> Neat little library.</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">estim2py</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what">What</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version">Version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#installing">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#api-quick-ref">API Quick Ref</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#status">Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-mode-details">Get Mode Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#more-commands">More commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#misc">Misc</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ethos">Ethos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#todo">Todo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Contents</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Sissy Becky.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

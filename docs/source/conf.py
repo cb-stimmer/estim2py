@@ -1,6 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../src'))
+from estim2py import __version__
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -13,7 +14,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'estim2py'
 copyright = '2026, Sissy Becky'
 author = 'Sissy Becky'
-release = '0.2.1'
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
