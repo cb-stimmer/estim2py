@@ -180,6 +180,20 @@ def test_legacy_set_mode_by_name(mock_serial):
     _ = con.set_mode_by_name("step")
     assert written(con)[-1] == b"M12\r"
 
+def test_del_closes_open_port(mock_serial):
+    con = Estim2pyConnection("COM_FAKE")
+    con.serial.reset_mock()
+    con.__del__()
+    con.serial.flush.assert_called_once()
+    con.serial.close.assert_called_once()
+
+def test_del_skips_closed_port(mock_serial):
+    con = Estim2pyConnection("COM_FAKE")
+    con.serial.is_open = False
+    con.serial.flush.side_effect = AssertionError("flushed a closed port")
+    con.__del__()
+    con.serial.close.assert_not_called()
+
 @pytest.mark.hardware
 def test_integration(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)

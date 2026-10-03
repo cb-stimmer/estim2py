@@ -73,7 +73,8 @@ class Estim2pyConnection():
 
     def __del__(self):
         # I don't think there would be any more pending output, but lets be sure of that.
-        if hasattr(self, 'serial') and hasattr(self.serial, "flush"):
+        # Skip a port that was never opened or was already closed, flushing that raises PortNotOpenError.
+        if getattr(self, "serial", None) is not None and self.serial.is_open:
             self.serial.flush()
             self.serial.close()
         

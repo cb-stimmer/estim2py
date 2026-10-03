@@ -37,5 +37,6 @@ def mock_serial(mocker, fake_2b_resp):
     mock_ser = mocker.patch('serial.Serial', autospec=True)
     mock_instance = mock_ser.return_value
     mock_instance.read_until.return_value = fake_2b_resp
+    mock_instance.is_open = True  # pyserial sets this per instance, so autospec does not know it
 
     return mock_ser
