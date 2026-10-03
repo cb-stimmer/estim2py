@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "estim2py"
 description = "Simple OO based connection to the Estim 2B box over the serial port."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = { text = "Public Domain" }
 authors = [
     {name = "Sissy Becky", email = "sissybecky@gmail.com"}
@@ -64,5 +64,5 @@ markers = [
 [tool.basedpyright]
 reportUnnecessaryIsInstance = "hint"
 verboseOutput = true
-venvPath = "."
-venv = ".venv"
+#venvPath = "."
+#venv = ".venv"

@@ -2,8 +2,6 @@ from typing import override
 from typing import Any
 import logging
 
-from warnings import deprecated
-
 from .modes import Estim2pyMode
 from .exceptions import Estim2pyError
 
