@@ -1,8 +1,10 @@
 Design: Supporting the New 2B Firmware Protocols
 ================================================
 
-*Design proposal, 2026-10-03. Status: step 1 of the rollout is implemented
-(see* :mod:`estim2py.protocol` *); steps 2–4 are proposed.*
+*Design proposal, 2026-10-03. Status: steps 1 and 2 of the rollout are
+implemented (see* :mod:`estim2py.protocol` *and*
+:class:`estim2py.connection.Estim2pyConnection` *); steps 3 and 4 are
+proposed.*
 
 Summary
 -------
@@ -341,12 +343,18 @@ package knows field positions.
        (it used to print ``<exception str() failed>``)
      - 1 (done)
    * - ``connection.py``
-     - New ``protocol="auto"`` argument. ``link()``/``unlink()`` send
-       ``protocol.join_command(on)``. New methods gated by
-       ``protocol.supports(feature)``. Handle ``ERR`` replies
-     - 2, 3
+     - New ``protocol="auto"`` argument and ``connection.protocol``.
+       Replies are parsed with the connection's protocol.
+       ``link()``/``unlink()`` send ``protocol.join_command(on)``. An ``ERR``
+       reply is resent once; an empty reply raises an error that mentions
+       the menu
+     - 2 (done)
+   * - ``connection.py``
+     - New methods gated by ``protocol.supports(feature)``
+     - 3
    * - ``simulated.py``
-     - ``Estim2pySimulatedConnection(protocol="2.106")`` simulates any
+     - Has a 2.106 ``protocol`` attribute (step 2).
+       ``Estim2pySimulatedConnection(protocol="2.106")`` simulates any
        firmware, including the power-change differences
      - 3
    * - ``modes.py``
@@ -449,17 +457,19 @@ parsing work on raw byte strings.
   counts and non-status replies raise ``Estim2pyError`` carrying the raw line;
   a version mismatch logs a warning.
 - **Round trip:** ``from_binary(bytes(status)) == status`` for every protocol.
-- **Connection without a port:** mock ``serial.Serial`` so ``read_until``
+- **Connection without a port (done):** mock ``serial.Serial`` so ``read_until``
   returns a canned line, and assert the bytes written (``J``/``U`` vs
   ``J1``/``J0``, ``Qn``, ``On``, ``Wn``, ``Rn``), the retry-once behaviour and
   ``ERR`` handling.
 - **Simulator:** run the existing simulated-connection tests against every
   protocol with ``pytest.mark.parametrize``.
-- **Hardware:** make the expected replies in the hardware tests
-  protocol-aware. ``test_integration_power_change_resets_a_b`` fails on 2.131B
-  only because ``L`` keeps C and D (see `Behaviour differences`_).
-  ``test_timeout`` uses an undefined ``con`` and now passes unexpectedly; it
-  needs a look.
+- **Hardware (done):** the expected replies in the hardware tests depend on
+  ``con.protocol``: what ``L`` does to C and D (see `Behaviour
+  differences`_), and modes above 13 and linking, which are expected
+  failures on 2.106 only. All pass on the 2.131B box.
+  ``test_timeout`` still needs a look: it uses a ``con`` it never creates, so
+  it fails with an ``AttributeError`` and is reported as an expected failure
+  for the wrong reason.
 - **Modes:** every number in both mode tables resolves to the expected name,
   and ``set_mode_by_name("step")`` sends ``M12`` on 2.106 and ``M15`` on beta
   firmware.
@@ -490,7 +500,7 @@ Rollout, one pull request each:
 1. **Done.** Add ``protocol.py`` with the parsers and detection, plus the
    parsing and detection tests. ``from_binary()`` uses it; no connection
    changes yet.
-2. Wire ``protocol=`` and detection into ``Estim2pyConnection``, switch
+2. **Done.** Wire ``protocol=`` and detection into ``Estim2pyConnection``, switch
    ``link()``/``unlink()`` to ``join_command()``, handle ``ERR`` and empty
    replies, and make the hardware tests protocol-aware.
 3. Add the beta-only methods, ``get_bias()``/``set_bias()``, the remaining

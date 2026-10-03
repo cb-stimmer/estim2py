@@ -159,6 +159,16 @@ PROTOCOLS: dict[int, type[Estim2pyProtocol]] = {
 """Known protocols, keyed by the field count of their status line."""
 
 
+def get_protocol(name: str) -> Estim2pyProtocol:
+    """Return the protocol with this name, e.g. "2.106", "2.119B" or "2.120B".
+
+    Raises ValueError for an unknown name."""
+    for p in PROTOCOLS.values():
+        if p.name == name:
+            return p()
+    raise ValueError(f"Unknown protocol {name!r}.  Known protocols: {', '.join(p.name for p in PROTOCOLS.values())}")
+
+
 def split_status(raw: bytes) -> list[str]:
     """Decode a raw status line and split it into fields.
 

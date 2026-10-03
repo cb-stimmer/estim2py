@@ -4,6 +4,8 @@ import serial  # pyright: ignore[reportMissingModuleSource]
 import time
 import logging
 
+from .exceptions import Estim2pyError
+from .protocol import Estim2pyProtocol, detect_protocol, get_protocol, split_status
 from .status import Estim2pyStatus
 
 logger = logging.getLogger(__name__)
@@ -32,6 +34,10 @@ class Estim2pyConnection():
     timeout - Serial timeout, sent straight to pyserial
     delay - enforced delay.  This gives the 2b enough time to act, and then respond. 
     do_flush - whether or not to flush input on status retrieval.   This is probably witchcraft and can be left as false.
+    protocol - "auto" (default) asks the box for its status and picks the protocol from the reply.
+    A protocol name ("2.106", "2.119B", "2.120B") or an Estim2pyProtocol skips the probe.
+
+    The protocol in use is available as connection.protocol.
     """
 
     BAUD: int = 9600
@@ -43,7 +49,8 @@ class Estim2pyConnection():
 
     TERMINATION_CHAR: Literal[b"\n"] = b"\n" 
     
-    def __init__(self, device: str, timeout:float=2, delay:float=0.04, do_flush:bool=False) -> None:
+    def __init__(self, device: str, timeout:float=2, delay:float=0.04, do_flush:bool=False,
+                 protocol: str | Estim2pyProtocol = "auto") -> None:
         self.delay: float = delay
         self.do_flush: bool = do_flush
         self.serial: serial.Serial = serial.Serial(
@@ -53,7 +60,15 @@ class Estim2pyConnection():
             bytesize = self.BYTESIZE,
             parity   = self.PARITY,
             stopbits = self.STOPBITS)
-        
+
+        if isinstance(protocol, Estim2pyProtocol):
+            self.protocol: Estim2pyProtocol = protocol
+        elif protocol == "auto":
+            self.protocol = self.__detect()
+        else:
+            self.protocol = get_protocol(protocol)
+        logger.info(f"Using protocol {self.protocol.name}")
+
     def __del__(self):
         # I don't think there would be any more pending output, but lets be sure of that.
         if hasattr(self, 'serial') and hasattr(self.serial, "flush"):
@@ -159,12 +174,12 @@ class Estim2pyConnection():
         return self.__send("H")
 
     def link(self):
-        """Enable's link mode and returns Estim2pyStatus.  Note, does not work on my box!"""
-        return self.__send("J")
+        """Links the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware."""
+        return self.__send(self.protocol.join_command(True))
 
     def unlink(self):
-        """Enable's link mode and returns Estim2pyStatus.  Note, does not work on my box!"""
-        return self.__send("U")
+        """Unlinks the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware."""
+        return self.__send(self.protocol.join_command(False))
     
     def kill(self):
         """Sets channels A and B to 0 and returns Estim2pyStatus"""
@@ -190,18 +205,46 @@ class Estim2pyConnection():
         logger.info(f"Received: {input.decode("ascii")}")
         return input
 
+    def __exchange(self, out: str) -> bytes:
+        """Send one command and return the raw reply.  Resends once if the box reports a buffer overrun."""
+        for attempt in range(2):
+            command = out+"\r" # thank you STPIHKAL https://buttplug.io/stpihkal/protocols/estim-systems/
+            logger.info(f"Sending command: {out}")
+
+            # kill the output buffer before sending
+            self.serial.reset_input_buffer()
+
+            self.serial.write(command.encode())  # pyright: ignore[reportUnusedCallResult]
+            self.serial.flush() # block until everything is written out... Required! https://www.pyserial.com/docs/writing-data#flush
+
+            # wait for delay before calling receive
+            logger.debug(f"Sleeping for: {self.delay}")
+            time.sleep(self.delay)
+
+            reply = self.__receive()
+            if reply.strip() != b"ERR":
+                return reply
+            logger.warning(f"2B reported a buffer overrun (ERR) on command {out!r}, attempt {attempt + 1} of 2")
+
+        raise Estim2pyError("2B reported a buffer overrun (ERR) twice.", out)
+
+    def __detect(self) -> Estim2pyProtocol:
+        """Ask the box for its status and return the matching protocol.  Tries twice."""
+        error = Estim2pyError("No reply from 2B.  Is it switched on and out of its menu?")
+        for attempt in range(2):
+            reply = self.__exchange("")
+            if not reply.strip():
+                logger.warning(f"No reply from 2B while detecting the protocol, attempt {attempt + 1} of 2")
+                continue
+            try:
+                return detect_protocol(reply)
+            except Estim2pyError as e:
+                logger.warning(f"Could not detect the protocol, attempt {attempt + 1} of 2: {e}")
+                error = e
+        raise error
+
     def __send(self, out: str) -> Estim2pyStatus:
-        command = out+"\r" # thank you STPIHKAL https://buttplug.io/stpihkal/protocols/estim-systems/
-        logger.info(f"Sending command: {out}")
-
-        # kill the output buffer before sending
-        self.serial.reset_input_buffer()
-
-        self.serial.write(command.encode())  # pyright: ignore[reportUnusedCallResult]
-        self.serial.flush() # block until everything is written out... Required! https://www.pyserial.com/docs/writing-data#flush
-
-        # wait for delay before calling receive
-        logger.debug(f"Sleeping for: {self.delay}")
-        time.sleep(self.delay)
-        
-        return Estim2pyStatus.from_binary(self.__receive())
+        reply = self.__exchange(out)
+        if not reply.strip():
+            raise Estim2pyError("No reply from 2B.  Is it switched on and out of its menu?", out)
+        return self.protocol.parse(split_status(reply))

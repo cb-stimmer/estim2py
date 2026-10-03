@@ -54,7 +54,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">Estim2pyConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_flush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.connection.</span></span><span class="sig-name descname"><span class="pre">Estim2pyConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.04</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_flush</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><span class="pre">Estim2pyProtocol</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Connect to the Estim 2b box, and manage communication</p>
 <p>All method calls will return an Estim2pyStatus object.</p>
@@ -65,7 +65,10 @@ device - the serial device to connect with.</p>
 <p>keywords:
 timeout - Serial timeout, sent straight to pyserial
 delay - enforced delay.  This gives the 2b enough time to act, and then respond.
-do_flush - whether or not to flush input on status retrieval.   This is probably witchcraft and can be left as false.</p>
+do_flush - whether or not to flush input on status retrieval.   This is probably witchcraft and can be left as false.
+protocol - “auto” (default) asks the box for its status and picks the protocol from the reply.
+A protocol name (“2.106”, “2.119B”, “2.120B”) or an Estim2pyProtocol skips the probe.</p>
+<p>The protocol in use is available as connection.protocol.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.BAUD">
 <span class="sig-name descname"><span class="pre">BAUD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9600</span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.BAUD" title="Link to this definition">¶</a></dt>
@@ -117,7 +120,7 @@ do_flush - whether or not to flush input on status retrieval.   This is probably
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.link">
 <span class="sig-name descname"><span class="pre">link</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.link" title="Link to this definition">¶</a></dt>
-<dd><p>Enable’s link mode and returns Estim2pyStatus.  Note, does not work on my box!</p>
+<dd><p>Links the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -195,7 +198,7 @@ True if all parameters were set, false if there was a mismatch.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.unlink">
 <span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.unlink" title="Link to this definition">¶</a></dt>
-<dd><p>Enable’s link mode and returns Estim2pyStatus.  Note, does not work on my box!</p>
+<dd><p>Unlinks the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
 </dd></dl>
 
 </dd></dl>
@@ -472,6 +475,13 @@ Estim2pyStatus, and how to spell the commands that differ between firmwares.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="estim2py.protocol.get_protocol">
+<span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">get_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><span class="pre">Estim2pyProtocol</span></a></span></span><a class="headerlink" href="#estim2py.protocol.get_protocol" title="Link to this definition">¶</a></dt>
+<dd><p>Return the protocol with this name, e.g. “2.106”, “2.119B” or “2.120B”.</p>
+<p>Raises ValueError for an unknown name.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="estim2py.protocol.split_status">
 <span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">split_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.protocol.split_status" title="Link to this definition">¶</a></dt>
 <dd><p>Decode a raw status line and split it into fields.</p>
@@ -518,7 +528,7 @@ You can send it False to not error on the next command.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.link">
 <span class="sig-name descname"><span class="pre">link</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.link" title="Link to this definition">¶</a></dt>
-<dd><p>Enable’s link mode and returns Estim2pyStatus.  Note, does not work on my box!</p>
+<dd><p>Links the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -571,7 +581,7 @@ mode_num (int): mode number to set to.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.unlink">
 <span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.unlink" title="Link to this definition">¶</a></dt>
-<dd><p>Enable’s link mode and returns Estim2pyStatus.  Note, does not work on my box!</p>
+<dd><p>Unlinks the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
 </dd></dl>
 
 </dd></dl>
@@ -795,6 +805,7 @@ The value is what is displayed on the LCD, which is half of that reported on the
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.PROTOCOLS"><code class="docutils literal notranslate"><span class="pre">PROTOCOLS</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.detect_protocol"><code class="docutils literal notranslate"><span class="pre">detect_protocol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.get_protocol"><code class="docutils literal notranslate"><span class="pre">get_protocol()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.split_status"><code class="docutils literal notranslate"><span class="pre">split_status()</span></code></a></li>
 </ul>
 </li>

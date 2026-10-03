@@ -3,6 +3,7 @@ from .__version__ import __version__
 from .status import Estim2pyStatus
 from .connection import Estim2pyConnection
 from .exceptions import Estim2pyError
+from .protocol import Legacy2106Protocol
 
 # NOTE!  Next refactor, override send and recieve, call super, and then set status
 class Estim2pySimulatedConnection(Estim2pyConnection):
@@ -16,6 +17,7 @@ class Estim2pySimulatedConnection(Estim2pyConnection):
     """
     def __init__(self):  # pyright: ignore[reportMissingSuperCall]
         self.serial = None
+        self.protocol = Legacy2106Protocol()
         self.do_throw = False
         self.reset_status()
 
