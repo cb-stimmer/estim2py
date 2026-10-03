@@ -46,6 +46,26 @@ Getting started
 
 That's the basics of it.  Estim2pyConnection is an object that you use to speak to the box.
 
+Firmware versions
+-----------------
+
+The 2B has had a few firmwares with different serial protocols.  The connection works out which one your box speaks when it connects, so you normally don't need to do anything.
+
+- 2.106, the original firmware.
+- 2.119B, a beta.
+- 2.120B and later betas (2.131B, for example).
+
+::
+    connection = Estim2pyConnection("/dev/ttyUSB0")
+    print(connection.protocol.name)  # "2.106", "2.119B" or "2.120B"
+
+    # Skip the detection if you already know
+    connection = Estim2pyConnection("/dev/ttyUSB0", protocol="2.120B")
+
+The box doesn't answer while you're in its menu.  If connecting fails with "No reply from 2B", leave the menu and try again.
+
+The betas add features (see below) and number the modes differently.  See :doc:`protocol_design` for all the details.
+
 Status
 ------
 
@@ -63,13 +83,26 @@ Those are the values right from the box.
 I've provided a bunch of methods for ease of use.  In particular channels are set by a number between 0-100, but are reported as a number between 0-200.
 
 ::
-    s.get_scaled_level('A')  #-> would return "20", so scaled to what you see on the display of the box, while the underlying serial protocol said "40".
-    s.high_power() # -> bool
-    s.low_power() # -> bool
-    s.linked() # -> bool
-    s.unlinked() # -> .... guess
+    s.get_channel('A')  #-> would return 20, so scaled to what you see on the display of the box, while the underlying serial protocol said 40.
+    s.is_high_power() # -> bool
+    s.is_low_power() # -> bool
+    s.is_dynamic_power() # -> bool, beta firmware only
+    s.is_linked() # -> bool
+    s.is_unlinked() # -> .... guess
 
 You can test Status's for equality, and it will do the right thing!  Two status's are considered equal if all of the parameters are equal (A,B,C,D,Mode,Power,Linked) while ignoring information like version or battery level.
+The beta settings (bias, output map, warp, ramp) are compared too, when both statuses have them.
+
+Beta firmware reports more:
+
+::
+    s.protocol    # "2.120B", the protocol that read this status
+    s.get_bias()  # Estim2pyBias.MAX, or None on 2.106
+    s.output_map  # 0, 1 or 2 for map A, B or C
+    s.warp        # 0-5 for x1 to x32, 2.120B and later
+    s.ramp        # 0-3 for x1 to x4, 2.120B and later
+
+Use `get_bias()` rather than `s.bias`: the raw number means different things on 2.119B and 2.120B.
 
 Get Mode Details
 ----------------
@@ -86,16 +119,25 @@ Right now if the mode only has 1 param, then the other returns none.  I recall r
 
 Modes don't have a good equality test.  Just use `status.mode`.  It's a number.
 
-You can get details of a mode by number too.
+But careful, the numbers depend on the firmware!  The betas added flo, cycle and twist, so from mode 3 on the numbers are different.  "step" is 12 on 2.106, and 15 on the betas.
+To be safe, set modes by name:
+
+::
+    connection.set_mode_by_name("step")  # sends the right number for your box
+
+You can get details of a mode by number too.  Pass the protocol name for beta numbers, without it you get 2.106.
 
 ::
     m = Estim2pyMode.get_mode(0)
+    m = Estim2pyMode.get_mode(3, "2.120B")  # flo
 
-Or get a dictionary of mode id and it's name.
+Or get a dictionary of mode id and it's name, or the number for a name.
 
 ::
     modes = Estim2pyMode.id_names()
-    print(modes[5]) # -> outputs "milk"
+    print(modes[5]) # -> outputs "wave"
+    print(Estim2pyMode.id_names("2.120B")[5]) # -> outputs "bsplit"
+    print(Estim2pyMode.get_id("step", "2.120B")) # -> 15
 
 
 More commands
@@ -111,15 +153,44 @@ OH, you can do other things with the connection too!
     connection.kill() # Set power to 0, keep all other parameters
 
 
-And you can use these, but they are BROKEN
+Link and unlink the A and B controls.  These work on the beta firmwares, but not on my 2.106 box.  I don't know why.
 
 ::
-    # these are implemented, but don't work! I don't know why.
-    connection.link()   # Link channels, if ... yanno...
-    connection.unlink() # might actually work! Who knows?
+    connection.link()
+    connection.unlink()
+
+Beta firmware has some extra commands.  On a box without them they raise `Estim2pyUnsupportedError`.
+
+::
+    from estim2py import Estim2pyBias
+
+    connection.dynamic()                    # dynamic power mode. Resets the bias to Max!
+    connection.set_bias(Estim2pyBias.AVERAGE)  # A, B, AVERAGE or MAX
+    connection.set_output_map(1)            # 0, 1 or 2 for map A, B or C
+    connection.step_channel('A', 1)         # A up by 1, use -1 for down
+    connection.set_warp(2)                  # 0-5 for x1 to x32, 2.120B and later
+    connection.set_ramp(1)                  # 0-3 for x1 to x4, 2.120B and later
+    connection.version()                    # just the status on 2.106
+
+Copy settings from one status to the box with `set_to_status()`.  This works between firmwares too: modes are matched by name.
+
+::
+    connection.set_to_status(saved_status)  # -> True if the box now matches
 
 
 Check the test in `test_connection.py` with the `@pytest.mark.hardware` tag for more examples.
+
+No box?
+-------
+
+`Estim2pySimulatedConnection` pretends to be a box, so you can write code without one plugged in.  Tell it which firmware to pretend to be.
+
+::
+    from estim2py import Estim2pySimulatedConnection
+
+    box = Estim2pySimulatedConnection()          # 2.106
+    box = Estim2pySimulatedConnection("2.120B")  # a beta
+    box.set_channel('A', 20)
 
 Misc
 ====
@@ -134,7 +205,7 @@ For that matter, we still refer to "C" and "D".
 
 But, with this library, you can be sure about what's going into and out of the box.  That way you can build something cooler.
 
-(That is, assuming I got a few of the details right.  Like that damn channel link!)
+(That is, assuming I got a few of the details right.  Like that damn channel link on 2.106!)
 
 Todo
 ----

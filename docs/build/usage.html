@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Usage &#8212; estim2py 0.3.0 documentation</title>
+    <title>Usage &#8212; estim2py 0.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=e259d695"></script>
+    <script src="_static/documentation_options.js?v=6c02275b"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -73,6 +73,24 @@ connection.set_channel(‘D’,50) # Sets the secoond parameeter, usually feelin
 </dl>
 <p>That’s the basics of it.  Estim2pyConnection is an object that you use to speak to the box.</p>
 </section>
+<section id="firmware-versions">
+<h2>Firmware versions<a class="headerlink" href="#firmware-versions" title="Link to this heading">¶</a></h2>
+<p>The 2B has had a few firmwares with different serial protocols.  The connection works out which one your box speaks when it connects, so you normally don’t need to do anything.</p>
+<ul class="simple">
+<li><p>2.106, the original firmware.</p></li>
+<li><p>2.119B, a beta.</p></li>
+<li><p>2.120B and later betas (2.131B, for example).</p></li>
+</ul>
+<dl>
+<dt>::</dt><dd><p>connection = Estim2pyConnection(“/dev/ttyUSB0”)
+print(connection.protocol.name)  # “2.106”, “2.119B” or “2.120B”</p>
+<p># Skip the detection if you already know
+connection = Estim2pyConnection(“/dev/ttyUSB0”, protocol=”2.120B”)</p>
+</dd>
+</dl>
+<p>The box doesn’t answer while you’re in its menu.  If connecting fails with “No reply from 2B”, leave the menu and try again.</p>
+<p>The betas add features (see below) and number the modes differently.  See <a class="reference internal" href="protocol_design.html"><span class="doc">Design: Supporting the New 2B Firmware Protocols</span></a> for all the details.</p>
+</section>
 <section id="status">
 <h2>Status<a class="headerlink" href="#status" title="Link to this heading">¶</a></h2>
 <p>Every response it returns is an Estim2pyStatus object that you can use to query the current status of the box.  You can also call <cite>get_status()</cite> at any time.</p>
@@ -86,14 +104,26 @@ connection.set_channel(‘D’,50) # Sets the secoond parameeter, usually feelin
 <p>Those are the values right from the box.</p>
 <p>I’ve provided a bunch of methods for ease of use.  In particular channels are set by a number between 0-100, but are reported as a number between 0-200.</p>
 <dl class="simple">
-<dt>::</dt><dd><p>s.get_scaled_level(‘A’)  #-&gt; would return “20”, so scaled to what you see on the display of the box, while the underlying serial protocol said “40”.
-s.high_power() # -&gt; bool
-s.low_power() # -&gt; bool
-s.linked() # -&gt; bool
-s.unlinked() # -&gt; …. guess</p>
+<dt>::</dt><dd><p>s.get_channel(‘A’)  #-&gt; would return 20, so scaled to what you see on the display of the box, while the underlying serial protocol said 40.
+s.is_high_power() # -&gt; bool
+s.is_low_power() # -&gt; bool
+s.is_dynamic_power() # -&gt; bool, beta firmware only
+s.is_linked() # -&gt; bool
+s.is_unlinked() # -&gt; …. guess</p>
 </dd>
 </dl>
-<p>You can test Status’s for equality, and it will do the right thing!  Two status’s are considered equal if all of the parameters are equal (A,B,C,D,Mode,Power,Linked) while ignoring information like version or battery level.</p>
+<p>You can test Status’s for equality, and it will do the right thing!  Two status’s are considered equal if all of the parameters are equal (A,B,C,D,Mode,Power,Linked) while ignoring information like version or battery level.
+The beta settings (bias, output map, warp, ramp) are compared too, when both statuses have them.</p>
+<p>Beta firmware reports more:</p>
+<dl class="simple">
+<dt>::</dt><dd><p>s.protocol    # “2.120B”, the protocol that read this status
+s.get_bias()  # Estim2pyBias.MAX, or None on 2.106
+s.output_map  # 0, 1 or 2 for map A, B or C
+s.warp        # 0-5 for x1 to x32, 2.120B and later
+s.ramp        # 0-3 for x1 to x4, 2.120B and later</p>
+</dd>
+</dl>
+<p>Use <cite>get_bias()</cite> rather than <cite>s.bias</cite>: the raw number means different things on 2.119B and 2.120B.</p>
 </section>
 <section id="get-mode-details">
 <h2>Get Mode Details<a class="headerlink" href="#get-mode-details" title="Link to this heading">¶</a></h2>
@@ -106,15 +136,24 @@ print(f”Mode [{m.mid}] {m.name} Param 1: {m.param_a} Param 2: {m.param_b} Note
 <p>I know param_a and param_b are bad names. Sorry.  Submit a bug report if it… uhh… bugs you.</p>
 <p>Right now if the mode only has 1 param, then the other returns none.  I recall reading that in instances where only one param is avaiable to the mode then only ‘C’ is used.  But I have yet to test it.</p>
 <p>Modes don’t have a good equality test.  Just use <cite>status.mode</cite>.  It’s a number.</p>
-<p>You can get details of a mode by number too.</p>
+<p>But careful, the numbers depend on the firmware!  The betas added flo, cycle and twist, so from mode 3 on the numbers are different.  “step” is 12 on 2.106, and 15 on the betas.
+To be safe, set modes by name:</p>
 <dl class="simple">
-<dt>::</dt><dd><p>m = Estim2pyMode.get_mode(0)</p>
+<dt>::</dt><dd><p>connection.set_mode_by_name(“step”)  # sends the right number for your box</p>
 </dd>
 </dl>
-<p>Or get a dictionary of mode id and it’s name.</p>
+<p>You can get details of a mode by number too.  Pass the protocol name for beta numbers, without it you get 2.106.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>m = Estim2pyMode.get_mode(0)
+m = Estim2pyMode.get_mode(3, “2.120B”)  # flo</p>
+</dd>
+</dl>
+<p>Or get a dictionary of mode id and it’s name, or the number for a name.</p>
 <dl class="simple">
 <dt>::</dt><dd><p>modes = Estim2pyMode.id_names()
-print(modes[5]) # -&gt; outputs “milk”</p>
+print(modes[5]) # -&gt; outputs “wave”
+print(Estim2pyMode.id_names(“2.120B”)[5]) # -&gt; outputs “bsplit”
+print(Estim2pyMode.get_id(“step”, “2.120B”)) # -&gt; 15</p>
 </dd>
 </dl>
 </section>
@@ -128,14 +167,41 @@ connection.low() # go into low power mode</p>
 connection.kill() # Set power to 0, keep all other parameters</p>
 </dd>
 </dl>
-<p>And you can use these, but they are BROKEN</p>
+<p>Link and unlink the A and B controls.  These work on the beta firmwares, but not on my 2.106 box.  I don’t know why.</p>
 <dl class="simple">
-<dt>::</dt><dd><p># these are implemented, but don’t work! I don’t know why.
-connection.link()   # Link channels, if … yanno…
-connection.unlink() # might actually work! Who knows?</p>
+<dt>::</dt><dd><p>connection.link()
+connection.unlink()</p>
+</dd>
+</dl>
+<p>Beta firmware has some extra commands.  On a box without them they raise <cite>Estim2pyUnsupportedError</cite>.</p>
+<dl>
+<dt>::</dt><dd><p>from estim2py import Estim2pyBias</p>
+<p>connection.dynamic()                    # dynamic power mode. Resets the bias to Max!
+connection.set_bias(Estim2pyBias.AVERAGE)  # A, B, AVERAGE or MAX
+connection.set_output_map(1)            # 0, 1 or 2 for map A, B or C
+connection.step_channel(‘A’, 1)         # A up by 1, use -1 for down
+connection.set_warp(2)                  # 0-5 for x1 to x32, 2.120B and later
+connection.set_ramp(1)                  # 0-3 for x1 to x4, 2.120B and later
+connection.version()                    # just the status on 2.106</p>
+</dd>
+</dl>
+<p>Copy settings from one status to the box with <cite>set_to_status()</cite>.  This works between firmwares too: modes are matched by name.</p>
+<dl class="simple">
+<dt>::</dt><dd><p>connection.set_to_status(saved_status)  # -&gt; True if the box now matches</p>
 </dd>
 </dl>
 <p>Check the test in <cite>test_connection.py</cite> with the <cite>&#64;pytest.mark.hardware</cite> tag for more examples.</p>
+</section>
+<section id="no-box">
+<h2>No box?<a class="headerlink" href="#no-box" title="Link to this heading">¶</a></h2>
+<p><cite>Estim2pySimulatedConnection</cite> pretends to be a box, so you can write code without one plugged in.  Tell it which firmware to pretend to be.</p>
+<dl>
+<dt>::</dt><dd><p>from estim2py import Estim2pySimulatedConnection</p>
+<p>box = Estim2pySimulatedConnection()          # 2.106
+box = Estim2pySimulatedConnection(“2.120B”)  # a beta
+box.set_channel(‘A’, 20)</p>
+</dd>
+</dl>
 </section>
 </section>
 <section id="misc">
@@ -146,7 +212,7 @@ connection.unlink() # might actually work! Who knows?</p>
 <p>Abstract out the low level protocol nicely, so that you can build a higher level on top of it easier.  You still have to be aware of the gory details, switching modes or power H/L will kill the values of A/B (and C/D).</p>
 <p>For that matter, we still refer to “C” and “D”.</p>
 <p>But, with this library, you can be sure about what’s going into and out of the box.  That way you can build something cooler.</p>
-<p>(That is, assuming I got a few of the details right.  Like that damn channel link!)</p>
+<p>(That is, assuming I got a few of the details right.  Like that damn channel link on 2.106!)</p>
 </section>
 <section id="todo">
 <h2>Todo<a class="headerlink" href="#todo" title="Link to this heading">¶</a></h2>
@@ -205,9 +271,11 @@ connection.unlink() # might actually work! Who knows?</p>
 <li class="toctree-l1"><a class="reference internal" href="#installing">Installing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#api-quick-ref">API Quick Ref</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#firmware-versions">Firmware versions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#status">Status</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#get-mode-details">Get Mode Details</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#more-commands">More commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#no-box">No box?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#misc">Misc</a><ul>
@@ -217,7 +285,7 @@ connection.unlink() # might actually work! Who knows?</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="estim2py.html">estim2py package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="protocol_design.html">Design: Supporting the New 2B Firmware Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol_design.html">Design: Supporting the New 2B Firmware Protocols</a></li>
 </ul>
 
 <div class="relations">

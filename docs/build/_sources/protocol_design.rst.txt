@@ -1,10 +1,8 @@
 Design: Supporting the New 2B Firmware Protocols
 ================================================
 
-*Design proposal, 2026-10-03. Status: steps 1–3 of the rollout are
-implemented (see* :mod:`estim2py.protocol` *and*
-:class:`estim2py.connection.Estim2pyConnection` *); step 4 (user docs and
-release) is still to do.*
+*Design proposal, 2026-10-03. Status: implemented in 0.4.0 (see*
+:mod:`estim2py.protocol` *and* :class:`estim2py.connection.Estim2pyConnection` *).*
 
 Summary
 -------
@@ -528,5 +526,5 @@ Rollout, one pull request each:
    replies, and make the hardware tests protocol-aware.
 3. **Done.** Add the beta-only methods, ``get_bias()``/``set_bias()``, the
    remaining status changes, per-firmware mode tables and simulator support.
-4. Update the user docs and release as 0.4.0 (new public API, nothing
-   removed).
+4. **Done.** Update the user docs (:doc:`usage`) and set the version to 0.4.0
+   (new public API, nothing removed).
