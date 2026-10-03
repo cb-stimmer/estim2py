@@ -475,11 +475,13 @@ Resolved:
 - 2.106 has no ``V`` command, so ``version()`` falls back to ``get_status()``
   there.
 - The test box is 2.131B and speaks the 13-field 2.120B protocol.
+- ``J1``/``J0`` link and unlink the controls on 2.131B: the join field
+  (index 8) changes and the box shows the controls as linked. The library's
+  ``link()`` fails on beta boxes only because it sends the 2.106 ``J``;
+  step 2 switches it to ``join_command()``.
 
 Still open:
 
-- Does ``J1``/``J0`` fix the join problem that ``link()`` documents ("does not
-  work on my box")? To be tested on the 2.131B box.
 - Does 2.119B reset C and D on ``L`` like 2.106, or keep them like 2.131B?
   No 2.119B box is available to check.
 

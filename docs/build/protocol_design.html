@@ -596,11 +596,13 @@ the new Flo mode.</p></li>
 <li><p>2.106 has no <code class="docutils literal notranslate"><span class="pre">V</span></code> command, so <code class="docutils literal notranslate"><span class="pre">version()</span></code> falls back to <code class="docutils literal notranslate"><span class="pre">get_status()</span></code>
 there.</p></li>
 <li><p>The test box is 2.131B and speaks the 13-field 2.120B protocol.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">J1</span></code>/<code class="docutils literal notranslate"><span class="pre">J0</span></code> link and unlink the controls on 2.131B: the join field
+(index 8) changes and the box shows the controls as linked. The library’s
+<code class="docutils literal notranslate"><span class="pre">link()</span></code> fails on beta boxes only because it sends the 2.106 <code class="docutils literal notranslate"><span class="pre">J</span></code>;
+step 2 switches it to <code class="docutils literal notranslate"><span class="pre">join_command()</span></code>.</p></li>
 </ul>
 <p>Still open:</p>
 <ul class="simple">
-<li><p>Does <code class="docutils literal notranslate"><span class="pre">J1</span></code>/<code class="docutils literal notranslate"><span class="pre">J0</span></code> fix the join problem that <code class="docutils literal notranslate"><span class="pre">link()</span></code> documents (“does not
-work on my box”)? To be tested on the 2.131B box.</p></li>
 <li><p>Does 2.119B reset C and D on <code class="docutils literal notranslate"><span class="pre">L</span></code> like 2.106, or keep them like 2.131B?
 No 2.119B box is available to check.</p></li>
 </ul>
