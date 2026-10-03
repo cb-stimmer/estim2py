@@ -3,11 +3,9 @@ from typing import Any
 import logging
 
 from .modes import Estim2pyMode
-from .exceptions import Estim2pyError
+from .protocol import detect_protocol, split_status
 
 logger = logging.getLogger(__name__)
-
-NUMBER_OF_COLONS = 9
 
 class Estim2pyStatus:
     """An object that reports back the status of the Estim Box.
@@ -16,8 +14,14 @@ class Estim2pyStatus:
 
     i.e. status.a will return 200 at max power, but get_channel('a') will return 100.
     """
-    def __init__(self, battery:int, a:int, b:int, c:int, d:int, mode:int, power:str, linked:int, version:str):
-        """Not meant for instantiation directly.  But you can if you want I guess?"""
+    def __init__(self, battery:int, a:int, b:int, c:int, d:int, mode:int, power:str, linked:int, version:str,
+                 bias:int|None=None, output_map:int|None=None, warp:int|None=None, ramp:int|None=None,
+                 protocol:str|None=None):
+        """Not meant for instantiation directly.  But you can if you want I guess?
+
+        bias and output_map are only reported by 2.119B and later firmware, warp and ramp only by 2.120B and later.
+        They are None when the firmware does not report them.  What a bias number means depends on the protocol.
+        protocol is the name of the protocol that parsed this status, or None if built by hand."""
         self.battery:int  = battery
         self.a: int = a
         self.b: int = b
@@ -27,6 +31,11 @@ class Estim2pyStatus:
         self.power: str = power
         self.linked: int = linked 
         self.version: str = version
+        self.bias: int | None = bias
+        self.output_map: int | None = output_map
+        self.warp: int | None = warp
+        self.ramp: int | None = ramp
+        self.protocol: str | None = protocol
 
     def get_channel(self, channel: str) -> int:
         """Returns the value of the channel as reported by UI on the box.
@@ -189,29 +198,9 @@ class Estim2pyStatus:
         return f"230:{self.a}:{self.b}:{self.c}:{self.d}:{self.mode}:{self.power}:{self.linked}:0.2.3"
     
     @staticmethod
-    def from_binary(bin: bytes):
+    def from_binary(bin: bytes) -> "Estim2pyStatus":
         """Return an Estim2pyStatus object from bytes.
 
+        The protocol (2.106, 2.119B or 2.120B firmware) is detected from the number of fields.
         This is mostly internal, but may be useful in some circumstances.  Check unit tests."""
-        converted_string = bin.decode().strip()
-        if not ":" in converted_string:
-            logger.error(f"Got unexpected input.  No colon in [{converted_string}]")
-            raise Estim2pyError("Unexpected input from 2B! Cannot parse into status.", converted_string)
-
-        vals = converted_string.split(":")
-
-        if len(vals) != NUMBER_OF_COLONS:
-            logger.error(f"Got unexpected input.  Wrong Number of Colons [{converted_string}] Expecting {NUMBER_OF_COLONS}")
-            raise Estim2pyError("Splitting failed.  Not enough parts:between:colon", converted_string)
-        
-        return Estim2pyStatus(int(vals[0]),\
-                              int(vals[1]),\
-                              int(vals[2]),\
-                              int(vals[3]),\
-                              int(vals[4]),\
-                              int(vals[5]),\
-                              str(vals[6]),\
-                              int(vals[7]),\
-                              str(vals[8]))
-
-     
+        return detect_protocol(bin).parse(split_status(bin))

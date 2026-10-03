@@ -28,6 +28,14 @@ estim2py.modes module
    :show-inheritance:
    :undoc-members:
 
+estim2py.protocol module
+------------------------
+
+.. automodule:: estim2py.protocol
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 estim2py.simulated module
 -------------------------
 

@@ -14,7 +14,7 @@
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Design: Supporting the New 2B Firmware Protocol" href="protocol_design.html" />
+    <link rel="next" title="Design: Supporting the New 2B Firmware Protocols" href="protocol_design.html" />
     <link rel="prev" title="Usage" href="usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -275,6 +275,210 @@ The key is the mode id, and the value is a tuple in the format of:
 </dd></dl>
 
 </section>
+<section id="module-estim2py.protocol">
+<span id="estim2py-protocol-module"></span><h2>estim2py.protocol module<a class="headerlink" href="#module-estim2py.protocol" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol">
+<span class="property"><span class="k"><span class="pre">final</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Beta2119Protocol</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Estim2pyProtocol</span></code></a></p>
+<p>Beta firmware 2.119B.  Status: battery:a:b:c:d:mode:power:bias:join:map:version</p>
+<p>Bias: 0 A, 1 B, 2 Average, 3 Max.
+The join field is stored in Estim2pyStatus.linked, so is_linked() means the same on every firmware.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.features">
+<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'high_speed',</span> <span class="pre">'output_map',</span> <span class="pre">'step'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.features" title="Link to this definition">¶</a></dt>
+<dd><p>Optional features beyond the common command set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.field_count">
+<span class="sig-name descname"><span class="pre">field_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.field_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of colon separated fields in the status line.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.join_command">
+<span class="sig-name descname"><span class="pre">join_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.join_command" title="Link to this definition">¶</a></dt>
+<dd><p>The command that turns join (linked controls) on or off.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2.119B'</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.name" title="Link to this definition">¶</a></dt>
+<dd><p>Short name, also stored on every status this protocol parses.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.power_modes">
+<span class="sig-name descname"><span class="pre">power_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'D',</span> <span class="pre">'H',</span> <span class="pre">'L'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.power_modes" title="Link to this definition">¶</a></dt>
+<dd><p>Power mode letters this firmware reports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.version_pattern">
+<span class="sig-name descname"><span class="pre">version_pattern</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Pattern</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('^2\\.119')</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.version_pattern" title="Link to this definition">¶</a></dt>
+<dd><p>If set, a version field that does not match logs a warning.  Detection still trusts the field count.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol">
+<span class="property"><span class="k"><span class="pre">final</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Beta2120Protocol</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Estim2pyProtocol</span></code></a></p>
+<p>Beta firmware 2.120B and later 2.1xxB.  Status: battery:a:b:c:d:mode:power:bias:join:map:warp:ramp:version</p>
+<p>Bias: 0 Max, 1 A, 2 B, 3 Average (numbered differently from 2.119B).
+Warp: 0-5 for x1 to x32.  Ramp: 0-3 for x1 to x4.
+The join field is stored in Estim2pyStatus.linked, so is_linked() means the same on every firmware.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.features">
+<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'output_map',</span> <span class="pre">'ramp',</span> <span class="pre">'step',</span> <span class="pre">'warp'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.features" title="Link to this definition">¶</a></dt>
+<dd><p>Optional features beyond the common command set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.field_count">
+<span class="sig-name descname"><span class="pre">field_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.field_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of colon separated fields in the status line.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.join_command">
+<span class="sig-name descname"><span class="pre">join_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.join_command" title="Link to this definition">¶</a></dt>
+<dd><p>The command that turns join (linked controls) on or off.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2.120B'</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.name" title="Link to this definition">¶</a></dt>
+<dd><p>Short name, also stored on every status this protocol parses.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.power_modes">
+<span class="sig-name descname"><span class="pre">power_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'D',</span> <span class="pre">'H',</span> <span class="pre">'L'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.power_modes" title="Link to this definition">¶</a></dt>
+<dd><p>Power mode letters this firmware reports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.version_pattern">
+<span class="sig-name descname"><span class="pre">version_pattern</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Pattern</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('^2\\.1[23]\\d')</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.version_pattern" title="Link to this definition">¶</a></dt>
+<dd><p>If set, a version field that does not match logs a warning.  Detection still trusts the field count.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Estim2pyProtocol</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>The serial protocol spoken by one 2B firmware family.</p>
+<p>A protocol knows how many fields the status line has, how to turn those fields into an
+Estim2pyStatus, and how to spell the commands that differ between firmwares.</p>
+<p>Use detect_protocol() to pick the right one from a raw status line.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.features">
+<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.features" title="Link to this definition">¶</a></dt>
+<dd><p>Optional features beyond the common command set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.field_count">
+<span class="sig-name descname"><span class="pre">field_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.field_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of colon separated fields in the status line.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.join_command">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">join_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.join_command" title="Link to this definition">¶</a></dt>
+<dd><p>The command that turns join (linked controls) on or off.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.name" title="Link to this definition">¶</a></dt>
+<dd><p>Short name, also stored on every status this protocol parses.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.parse" title="Link to this definition">¶</a></dt>
+<dd><p>Return an Estim2pyStatus from the colon separated fields of a status line.</p>
+<p>Raises Estim2pyError if the fields do not fit this protocol.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.power_modes">
+<span class="sig-name descname"><span class="pre">power_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.power_modes" title="Link to this definition">¶</a></dt>
+<dd><p>Power mode letters this firmware reports.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.supports">
+<span class="sig-name descname"><span class="pre">supports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.supports" title="Link to this definition">¶</a></dt>
+<dd><p>Returns True if this firmware supports the named optional feature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.version_pattern">
+<span class="sig-name descname"><span class="pre">version_pattern</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Pattern</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.version_pattern" title="Link to this definition">¶</a></dt>
+<dd><p>If set, a version field that does not match logs a warning.  Detection still trusts the field count.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="estim2py.protocol.Legacy2106Protocol">
+<span class="property"><span class="k"><span class="pre">final</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Legacy2106Protocol</span></span><a class="headerlink" href="#estim2py.protocol.Legacy2106Protocol" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">Estim2pyProtocol</span></code></a></p>
+<p>Firmware 2.106 and earlier.  Status: battery:a:b:c:d:mode:power:linked:version</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Legacy2106Protocol.field_count">
+<span class="sig-name descname"><span class="pre">field_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></span><a class="headerlink" href="#estim2py.protocol.Legacy2106Protocol.field_count" title="Link to this definition">¶</a></dt>
+<dd><p>Number of colon separated fields in the status line.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Legacy2106Protocol.join_command">
+<span class="sig-name descname"><span class="pre">join_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#estim2py.protocol.Legacy2106Protocol.join_command" title="Link to this definition">¶</a></dt>
+<dd><p>The command that turns join (linked controls) on or off.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Legacy2106Protocol.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'2.106'</span></span><a class="headerlink" href="#estim2py.protocol.Legacy2106Protocol.name" title="Link to this definition">¶</a></dt>
+<dd><p>Short name, also stored on every status this protocol parses.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Legacy2106Protocol.power_modes">
+<span class="sig-name descname"><span class="pre">power_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'H',</span> <span class="pre">'L'})</span></span><a class="headerlink" href="#estim2py.protocol.Legacy2106Protocol.power_modes" title="Link to this definition">¶</a></dt>
+<dd><p>Power mode letters this firmware reports.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="estim2py.protocol.PROTOCOLS">
+<span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">PROTOCOLS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><span class="pre">Estim2pyProtocol</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{9:</span> <span class="pre">&lt;class</span> <span class="pre">'estim2py.protocol.Legacy2106Protocol'&gt;,</span> <span class="pre">11:</span> <span class="pre">&lt;class</span> <span class="pre">'estim2py.protocol.Beta2119Protocol'&gt;,</span> <span class="pre">13:</span> <span class="pre">&lt;class</span> <span class="pre">'estim2py.protocol.Beta2120Protocol'&gt;}</span></span><a class="headerlink" href="#estim2py.protocol.PROTOCOLS" title="Link to this definition">¶</a></dt>
+<dd><p>Known protocols, keyed by the field count of their status line.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="estim2py.protocol.detect_protocol">
+<span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">detect_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><span class="pre">Estim2pyProtocol</span></a></span></span><a class="headerlink" href="#estim2py.protocol.detect_protocol" title="Link to this definition">¶</a></dt>
+<dd><p>Return the protocol that matches a raw status line, chosen by its field count.</p>
+<p>Raises Estim2pyError carrying the raw line if no known protocol matches.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="estim2py.protocol.split_status">
+<span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">split_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.protocol.split_status" title="Link to this definition">¶</a></dt>
+<dd><p>Decode a raw status line and split it into fields.</p>
+<p>Raises Estim2pyError if the line is not a colon separated status.</p>
+</dd></dl>
+
+</section>
 <section id="module-estim2py.simulated">
 <span id="estim2py-simulated-module"></span><h2>estim2py.simulated module<a class="headerlink" href="#module-estim2py.simulated" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -377,7 +581,7 @@ mode_num (int): mode number to set to.</p>
 <span id="estim2py-status-module"></span><h2>estim2py.status module<a class="headerlink" href="#module-estim2py.status" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.status.</span></span><span class="sig-name descname"><span class="pre">Estim2pyStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.status.</span></span><span class="sig-name descname"><span class="pre">Estim2pyStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ramp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>An object that reports back the status of the Estim Box.</p>
 <p>Object members are direct from the serial port.  Object methods relate closer to what the box displays and return useful python objects.</p>
@@ -399,9 +603,10 @@ the values of the tuples inside the dictionary does nothing.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.from_binary">
-<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.from_binary" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.from_binary" title="Link to this definition">¶</a></dt>
 <dd><p>Return an Estim2pyStatus object from bytes.</p>
-<p>This is mostly internal, but may be useful in some circumstances.  Check unit tests.</p>
+<p>The protocol (2.106, 2.119B or 2.120B firmware) is detected from the number of fields.
+This is mostly internal, but may be useful in some circumstances.  Check unit tests.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -551,6 +756,48 @@ The value is what is displayed on the LCD, which is half of that reported on the
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-estim2py.protocol">estim2py.protocol module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.features"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.features</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.field_count"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.field_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.join_command"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.join_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.name"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.power_modes"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.power_modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.version_pattern"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.version_pattern</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.features"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.features</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.field_count"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.field_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.join_command"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.join_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.name"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.power_modes"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.power_modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.version_pattern"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.version_pattern</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.features"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.features</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.field_count"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.field_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.join_command"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.join_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.name"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.parse"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.power_modes"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.power_modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.supports"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.supports()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.version_pattern"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.version_pattern</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Legacy2106Protocol"><code class="docutils literal notranslate"><span class="pre">Legacy2106Protocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Legacy2106Protocol.field_count"><code class="docutils literal notranslate"><span class="pre">Legacy2106Protocol.field_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Legacy2106Protocol.join_command"><code class="docutils literal notranslate"><span class="pre">Legacy2106Protocol.join_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Legacy2106Protocol.name"><code class="docutils literal notranslate"><span class="pre">Legacy2106Protocol.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Legacy2106Protocol.power_modes"><code class="docutils literal notranslate"><span class="pre">Legacy2106Protocol.power_modes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.PROTOCOLS"><code class="docutils literal notranslate"><span class="pre">PROTOCOLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.detect_protocol"><code class="docutils literal notranslate"><span class="pre">detect_protocol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.split_status"><code class="docutils literal notranslate"><span class="pre">split_status()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py.simulated">estim2py.simulated module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.error_on_next"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.error_on_next()</span></code></a></li>
@@ -591,7 +838,7 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="protocol_design.html">Design: Supporting the New 2B Firmware Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol_design.html">Design: Supporting the New 2B Firmware Protocols</a></li>
 </ul>
 
 <div class="relations">
@@ -599,7 +846,7 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
-      <li>Next: <a href="protocol_design.html" title="next chapter">Design: Supporting the New 2B Firmware Protocol</a></li>
+      <li>Next: <a href="protocol_design.html" title="next chapter">Design: Supporting the New 2B Firmware Protocols</a></li>
   </ul></li>
 </ul>
 </div>
