@@ -163,8 +163,9 @@ at 12–13, so the same ``Mnn`` command starts a different program on each box.
      - —
      - Training
 
-Cycle and Twist reuse Thrust's C/D meanings and description for now. Flo has
-no description yet.
+Flo is a continuous mode: C controls the feel of channel A and D controls the
+feel of channel B. Cycle and Twist reuse Thrust's C/D meanings and description
+for now.
 
 Commands
 ~~~~~~~~
@@ -429,7 +430,8 @@ Open questions and rollout
 Resolved:
 
 - The 2.119B box ends replies with ``\n``, like 2.106.
-- The 2.119B mode list is known (see `Modes`_).
+- The 2.119B mode list is known (see `Modes`_), including what C and D do in
+  the new Flo mode.
 - 2.106 has no ``V`` command, so ``version()`` falls back to ``get_status()``
   there.
 
@@ -437,7 +439,6 @@ Still open:
 
 - Does ``J1``/``J0`` fix the join problem that ``link()`` documents ("does not
   work on my box")? To be tested on the 2.119B box.
-- What does the new Flo mode do, and what do C and D control in it?
 
 Rollout, one pull request each:
 
