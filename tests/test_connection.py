@@ -1,6 +1,8 @@
 from estim2py import Estim2pyConnection
 from estim2py import Estim2pyStatus
 from estim2py import Estim2pyError
+from estim2py import Estim2pyBias
+from estim2py import Estim2pyUnsupportedError
 from estim2py.protocol import Beta2120Protocol
 import pytest
 
@@ -113,6 +115,71 @@ def test_reply_parsed_with_connection_protocol(mock_serial):
     with pytest.raises(Estim2pyError):
         _ = con.get_status()
 
+@pytest.mark.parametrize("call", [
+    lambda con: con.dynamic(),
+    lambda con: con.set_bias(Estim2pyBias.A),
+    lambda con: con.set_output_map(1),
+    lambda con: con.step_channel("A", 1),
+    lambda con: con.set_warp(1),
+    lambda con: con.set_ramp(1)])
+def test_beta_methods_unsupported_on_legacy(call, mock_serial):
+    con = Estim2pyConnection("COM_FAKE")
+    with pytest.raises(Estim2pyUnsupportedError):
+        _ = call(con)
+    assert written(con) == [b"\r"]
+
+@pytest.mark.parametrize("call,command", [
+    (lambda con: con.dynamic(), b"Y\r"),
+    (lambda con: con.set_bias(Estim2pyBias.MAX), b"Q0\r"),
+    (lambda con: con.set_bias(Estim2pyBias.AVERAGE), b"Q3\r"),
+    (lambda con: con.set_output_map(2), b"O2\r"),
+    (lambda con: con.step_channel("a", 1), b"A+\r"),
+    (lambda con: con.step_channel("D", -1), b"D-\r"),
+    (lambda con: con.set_warp(5), b"W5\r"),
+    (lambda con: con.set_ramp(3), b"R3\r"),
+    (lambda con: con.version(), b"V\r"),
+    (lambda con: con.set_mode_by_name("step"), b"M15\r")])
+def test_beta_methods_send(call, command, mock_serial):
+    mock_serial.return_value.read_until.return_value = BOX_2131_LINE
+    con = Estim2pyConnection("COM_FAKE")
+    _ = call(con)
+    assert written(con)[-1] == command
+
+def test_set_bias_uses_2119_numbering(mock_serial):
+    mock_serial.return_value.read_until.return_value = b'344:0:0:100:100:0:L:0:0:0:2.119B\n'
+    con = Estim2pyConnection("COM_FAKE")
+    _ = con.set_bias(Estim2pyBias.MAX)
+    assert written(con)[-1] == b"Q3\r"
+
+def test_warp_unsupported_on_2119(mock_serial):
+    mock_serial.return_value.read_until.return_value = b'344:0:0:100:100:0:L:0:0:0:2.119B\n'
+    con = Estim2pyConnection("COM_FAKE")
+    with pytest.raises(Estim2pyUnsupportedError):
+        _ = con.set_warp(1)
+
+@pytest.mark.parametrize("call", [
+    lambda con: con.set_output_map(3),
+    lambda con: con.set_warp(6),
+    lambda con: con.set_ramp(4),
+    lambda con: con.step_channel("E", 1),
+    lambda con: con.step_channel("A", 2),
+    lambda con: con.set_mode_by_name("disco")])
+def test_beta_method_arguments(call, mock_serial):
+    mock_serial.return_value.read_until.return_value = BOX_2131_LINE
+    con = Estim2pyConnection("COM_FAKE")
+    with pytest.raises(ValueError):
+        _ = call(con)
+
+def test_legacy_version_falls_back_to_status(mock_serial):
+    con = Estim2pyConnection("COM_FAKE")
+    _ = con.version()
+    assert written(con) == [b"\r", b"\r"]
+
+def test_legacy_set_mode_by_name(mock_serial):
+    con = Estim2pyConnection("COM_FAKE")
+    _ = con.set_mode_by_name("step")
+    assert written(con)[-1] == b"M12\r"
+
 @pytest.mark.hardware
 def test_integration(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
@@ -178,6 +245,42 @@ def test_integration_link(con, reset_2b_resp):
     assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
     assert con.link() == Estim2pyStatus.from_binary(b'666:0:0:100:100:0:L:1:2.106\n')
     assert con.unlink() == Estim2pyStatus.from_binary(reset_2b_resp)
+
+@pytest.mark.hardware
+def test_integration_beta_settings(con, reset_2b_resp):
+    """Checks the beta-only commands, and that the simulator's guesses match the box.  A and B stay at 0."""
+    if not con.protocol.supports("dynamic"):
+        pytest.skip(f"Firmware {con.protocol.name} has no beta settings.")
+    assert con.reset() == Estim2pyStatus.from_binary(reset_2b_resp)
+
+    if con.protocol.supports("warp"):
+        assert con.set_warp(2).warp == 2
+        assert con.set_ramp(1).ramp == 1
+    assert con.set_output_map(1).output_map == 1
+    assert con.set_bias(Estim2pyBias.AVERAGE).get_bias() == Estim2pyBias.AVERAGE
+    assert con.step_channel("C", 1).get_c() == 51
+    assert con.step_channel("C", -1).get_c() == 50
+    assert con.link().is_linked()
+
+    # Like the simulator: a new mode resets the channels but keeps power, link and the beta settings.
+    _ = con.set_channel("C", 75)
+    s = con.set_mode_by_name("flo")
+    assert s.get_mode().name == "flo"
+    assert (s.c, s.d) == (100, 100)
+    assert s.is_linked()
+    assert s.output_map == 1
+    assert s.get_bias() == Estim2pyBias.AVERAGE
+    if con.protocol.supports("warp"):
+        assert (s.warp, s.ramp) == (2, 1)
+
+    # Dynamic power resets the bias to 0, which is Max on 2.120B and later.
+    s = con.dynamic()
+    assert s.is_dynamic_power()
+    assert (s.a, s.b) == (0, 0)
+    assert s.bias == 0
+    assert con.version().protocol == con.protocol.name
+
+    _ = con.reset()
 
 @pytest.fixture
 def con(hardware_port):

@@ -3,14 +3,26 @@
 import logging
 import re
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import TYPE_CHECKING, ClassVar, final, override
 
-from .exceptions import Estim2pyError
+from .exceptions import Estim2pyError, Estim2pyUnsupportedError
 
 if TYPE_CHECKING:
     from .status import Estim2pyStatus
 
 logger = logging.getLogger(__name__)
+
+
+class Estim2pyBias(Enum):
+    """Dynamic bias setting, used with dynamic power.
+
+    The firmwares number these differently, so use these names rather than raw numbers."""
+
+    A = "A"
+    B = "B"
+    AVERAGE = "average"
+    MAX = "max"
 
 
 class Estim2pyProtocol(ABC):
@@ -37,9 +49,16 @@ class Estim2pyProtocol(ABC):
     version_pattern: ClassVar[re.Pattern[str] | None] = None
     """If set, a version field that does not match logs a warning.  Detection still trusts the field count."""
 
+    bias_codes: ClassVar[dict[Estim2pyBias, int]] = {}
+    """The number this firmware uses for each bias setting.  Empty if bias is not supported."""
+
     @abstractmethod
     def _build(self, fields: list[str]) -> "Estim2pyStatus":
         """Build a status from fields that are known to be the right count."""
+
+    @abstractmethod
+    def _fields(self, status: "Estim2pyStatus") -> list[object]:
+        """The fields of the status line for this status, in order."""
 
     @abstractmethod
     def join_command(self, on: bool) -> str:
@@ -48,6 +67,29 @@ class Estim2pyProtocol(ABC):
     def supports(self, feature: str) -> bool:
         """Returns True if this firmware supports the named optional feature."""
         return feature in self.features
+
+    def format(self, status: "Estim2pyStatus") -> str:
+        """Return the status line this firmware would send for status, without line ending.
+
+        Fields this firmware reports but status does not have are sent as 0."""
+        return ":".join("0" if f is None else str(f) for f in self._fields(status))
+
+    def bias_code(self, bias: Estim2pyBias) -> int:
+        """The number this firmware uses for a bias setting.
+
+        Raises Estim2pyUnsupportedError if this firmware has no dynamic bias."""
+        if not self.bias_codes:
+            raise Estim2pyUnsupportedError(f"Dynamic bias is not supported by firmware {self.name}.")
+        return self.bias_codes[bias]
+
+    def bias_from_code(self, code: int) -> Estim2pyBias:
+        """The bias setting for a number reported by this firmware.
+
+        Raises Estim2pyError for a number this firmware does not use."""
+        for bias, c in self.bias_codes.items():
+            if c == code:
+                return bias
+        raise Estim2pyError(f"Unknown bias {code} for firmware {self.name}.")
 
     def parse(self, fields: list[str]) -> "Estim2pyStatus":
         """Return an Estim2pyStatus from the colon separated fields of a status line.
@@ -91,6 +133,11 @@ class Legacy2106Protocol(Estim2pyProtocol):
                               int(f[5]), f[6], int(f[7]), f[8], protocol=self.name)
 
     @override
+    def _fields(self, status: "Estim2pyStatus") -> list[object]:
+        s = status
+        return [s.battery, s.a, s.b, s.c, s.d, s.mode, s.power, s.linked, s.version]
+
+    @override
     def join_command(self, on: bool) -> str:
         return "J" if on else "U"
 
@@ -105,8 +152,9 @@ class Beta2119Protocol(Estim2pyProtocol):
     name = "2.119B"
     field_count = 11
     power_modes = frozenset("LHD")
-    features = frozenset({"dynamic", "bias", "output_map", "step", "high_speed"})
+    features = frozenset({"dynamic", "bias", "output_map", "step", "version"})
     version_pattern = re.compile(r"^2\.119")
+    bias_codes: ClassVar[dict[Estim2pyBias, int]] = {Estim2pyBias.A: 0, Estim2pyBias.B: 1, Estim2pyBias.AVERAGE: 2, Estim2pyBias.MAX: 3}
 
     @override
     def _build(self, fields: list[str]) -> "Estim2pyStatus":
@@ -117,6 +165,11 @@ class Beta2119Protocol(Estim2pyProtocol):
         return Estim2pyStatus(int(f[0]), int(f[1]), int(f[2]), int(f[3]), int(f[4]),
                               int(f[5]), f[6], int(f[8]), f[10],
                               bias=int(f[7]), output_map=int(f[9]), protocol=self.name)
+
+    @override
+    def _fields(self, status: "Estim2pyStatus") -> list[object]:
+        s = status
+        return [s.battery, s.a, s.b, s.c, s.d, s.mode, s.power, s.bias, s.linked, s.output_map, s.version]
 
     @override
     def join_command(self, on: bool) -> str:
@@ -134,8 +187,9 @@ class Beta2120Protocol(Estim2pyProtocol):
     name = "2.120B"
     field_count = 13
     power_modes = frozenset("LHD")
-    features = frozenset({"dynamic", "bias", "output_map", "step", "warp", "ramp"})
+    features = frozenset({"dynamic", "bias", "output_map", "step", "warp", "ramp", "version"})
     version_pattern = re.compile(r"^2\.1[23]\d")
+    bias_codes: ClassVar[dict[Estim2pyBias, int]] = {Estim2pyBias.MAX: 0, Estim2pyBias.A: 1, Estim2pyBias.B: 2, Estim2pyBias.AVERAGE: 3}
 
     @override
     def _build(self, fields: list[str]) -> "Estim2pyStatus":
@@ -147,6 +201,12 @@ class Beta2120Protocol(Estim2pyProtocol):
                               int(f[5]), f[6], int(f[8]), f[12],
                               bias=int(f[7]), output_map=int(f[9]), warp=int(f[10]), ramp=int(f[11]),
                               protocol=self.name)
+
+    @override
+    def _fields(self, status: "Estim2pyStatus") -> list[object]:
+        s = status
+        return [s.battery, s.a, s.b, s.c, s.d, s.mode, s.power, s.bias, s.linked, s.output_map,
+                s.warp, s.ramp, s.version]
 
     @override
     def join_command(self, on: bool) -> str:

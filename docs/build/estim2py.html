@@ -100,6 +100,12 @@ A protocol name (“2.106”, “2.119B”, “2.120B”) or an Estim2pyProtocol
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.dynamic">
+<span class="sig-name descname"><span class="pre">dynamic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.dynamic" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the box to dynamic power mode and returns Estim2pyStatus.  Beta firmware only.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.get_status">
 <span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.get_status" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a Estim2pyStatus object</p>
@@ -148,6 +154,14 @@ A protocol name (“2.106”, “2.119B”, “2.120B”) or an Estim2pyProtocol
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_bias">
+<span class="sig-name descname"><span class="pre">set_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_bias" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the dynamic bias (used with dynamic power) and returns Estim2pyStatus.  Beta firmware only.</p>
+<p>args:
+bias (Estim2pyBias): A, B, AVERAGE or MAX.  The firmwares number these differently, this sends the right number.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_c">
 <span class="sig-name descname"><span class="pre">set_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelVal" title="estim2py.connection.ChannelVal"><span class="pre">ChannelVal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_c" title="Link to this definition">¶</a></dt>
 <dd><p>Set channel C to val</p>
@@ -177,28 +191,69 @@ Estim2pyStatus</p>
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_mode">
 <span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Sets the mode to the numbered mode and returns Estim2pyStatus.</p>
-<p>Doesn’t accept arguments over 100.  Note that my box only accepts up to 13.
-(I might need an update.)</p>
+<p>Doesn’t accept arguments over 100.  2.106 has modes 0-13, beta firmware 0-16, and the
+numbers mean different modes.  set_mode_by_name() works on every firmware.</p>
 <p>args:
 mode_num (int): mode number to set to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_mode_by_name">
+<span class="sig-name descname"><span class="pre">set_mode_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_mode_by_name" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the mode by name, e.g. “step”, using this firmware’s mode numbers.  Returns Estim2pyStatus.</p>
+<p>Raises ValueError for a mode this firmware does not have.  See Estim2pyMode for the names.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_output_map">
+<span class="sig-name descname"><span class="pre">set_output_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_output_map" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the output map (0 Map A, 1 Map B, 2 Map C) and returns Estim2pyStatus.  Beta firmware only.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_ramp">
+<span class="sig-name descname"><span class="pre">set_ramp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ramp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_ramp" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the ramp step (0-3 for x1 to x4) and returns Estim2pyStatus.  2.120B firmware and later.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_to_status">
 <span class="sig-name descname"><span class="pre">set_to_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_to_status" title="Link to this definition">¶</a></dt>
 <dd><p>Change all settings to the input status. Returns a success boolean.</p>
-<p>This will cowardly set the link to 0 before trying to send all the statuses
-Until I figure out what is wrong with channel link.</p>
+<p>The status may come from a box with different firmware: the mode is then set by name, and the
+bias by setting.  Settings this firmware does not have are skipped.</p>
+<p>On 2.106 firmware this will cowardly leave link alone and expect it off,
+until I figure out what is wrong with channel link there.</p>
 <p>args:
 to_status (Estim2pyStatus): target status.</p>
 <p>returns:
 True if all parameters were set, false if there was a mismatch.</p>
+<p>raises:
+ValueError if the status is in a mode this firmware does not have (e.g. flo on 2.106).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.set_warp">
+<span class="sig-name descname"><span class="pre">set_warp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">warp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.set_warp" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the time warp factor (0-5 for x1 to x32) and returns Estim2pyStatus.  2.120B firmware and later.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.step_channel">
+<span class="sig-name descname"><span class="pre">step_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.connection.ChannelName" title="estim2py.connection.ChannelName"><span class="pre">ChannelName</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.step_channel" title="Link to this definition">¶</a></dt>
+<dd><p>Raises (direction 1) or lowers (direction -1) a channel by 1 and returns Estim2pyStatus.  Beta firmware only.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.unlink">
 <span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.unlink" title="Link to this definition">¶</a></dt>
 <dd><p>Unlinks the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.connection.Estim2pyConnection.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></span><a class="headerlink" href="#estim2py.connection.Estim2pyConnection.version" title="Link to this definition">¶</a></dt>
+<dd><p>Asks the box for its version and returns Estim2pyStatus.  Without a version command (2.106) this is get_status().</p>
 </dd></dl>
 
 </dd></dl>
@@ -212,6 +267,13 @@ True if all parameters were set, false if there was a mismatch.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="estim2py.exceptions.Estim2pyUnsupportedError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.exceptions.</span></span><span class="sig-name descname"><span class="pre">Estim2pyUnsupportedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.exceptions.Estim2pyUnsupportedError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#estim2py.exceptions.Estim2pyError" title="estim2py.exceptions.Estim2pyError"><code class="xref py py-class docutils literal notranslate"><span class="pre">Estim2pyError</span></code></a></p>
+<p>The connected firmware does not support the requested feature.</p>
+</dd></dl>
+
 </section>
 <section id="module-estim2py.modes">
 <span id="estim2py-modes-module"></span><h2>estim2py.modes module<a class="headerlink" href="#module-estim2py.modes" title="Link to this heading">¶</a></h2>
@@ -221,15 +283,31 @@ True if all parameters were set, false if there was a mismatch.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class representing a mode for the Estim 2b.</p>
 <p>Construct with Estim2pyMode.get_mode(int).  That will return the relevant mode by integer id.</p>
+<p>2.106 and the beta firmwares (2.119B and later) number the modes differently.  Pass the protocol
+name to get_mode(), id_names() and get_id() to use the right numbering; without it, 2.106 is used.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.beta_modes">
+<span class="sig-name descname"><span class="pre">beta_modes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{0:</span> <span class="pre">('pulse',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Pulsing</span> <span class="pre">on</span> <span class="pre">and</span> <span class="pre">off'),</span> <span class="pre">1:</span> <span class="pre">('bounce',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Pulsing</span> <span class="pre">alternatively'),</span> <span class="pre">2:</span> <span class="pre">('continuous',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">None,</span> <span class="pre">'Both</span> <span class="pre">channels</span> <span class="pre">always</span> <span class="pre">on'),</span> <span class="pre">3:</span> <span class="pre">('flo',</span> <span class="pre">'A</span> <span class="pre">feel',</span> <span class="pre">'B</span> <span class="pre">feel',</span> <span class="pre">'Continuous,</span> <span class="pre">C</span> <span class="pre">sets</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">of</span> <span class="pre">channel</span> <span class="pre">A</span> <span class="pre">and</span> <span class="pre">D</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">of</span> <span class="pre">channel</span> <span class="pre">B'),</span> <span class="pre">4:</span> <span class="pre">('asplit',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'A</span> <span class="pre">Pulse</span> <span class="pre">B</span> <span class="pre">Continuous'),</span> <span class="pre">5:</span> <span class="pre">('bsplit',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'B</span> <span class="pre">Pulse</span> <span class="pre">A</span> <span class="pre">Continuous'),</span> <span class="pre">6:</span> <span class="pre">('wave',</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase',</span> <span class="pre">'wave</span> <span class="pre">feel',</span> <span class="pre">'Output</span> <span class="pre">increases</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">to</span> <span class="pre">0'),</span> <span class="pre">7:</span> <span class="pre">('waterfall',</span> <span class="pre">'speed</span> <span class="pre">of</span> <span class="pre">increase</span> <span class="pre">/</span> <span class="pre">decrease',</span> <span class="pre">'waterfall</span> <span class="pre">feel',</span> <span class="pre">'Output</span> <span class="pre">to</span> <span class="pre">power,</span> <span class="pre">then</span> <span class="pre">back</span> <span class="pre">down'),</span> <span class="pre">8:</span> <span class="pre">('squeeze',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'feel',</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow'),</span> <span class="pre">9:</span> <span class="pre">('milk',</span> <span class="pre">'pulse</span> <span class="pre">speed',</span> <span class="pre">'feel',</span> <span class="pre">'Pulse</span> <span class="pre">rate</span> <span class="pre">increases</span> <span class="pre">and</span> <span class="pre">then</span> <span class="pre">drops</span> <span class="pre">to</span> <span class="pre">slow,</span> <span class="pre">b</span> <span class="pre">channel</span> <span class="pre">alternates'),</span> <span class="pre">10:</span> <span class="pre">('throb',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">dropping</span> <span class="pre">to</span> <span class="pre">0'),</span> <span class="pre">11:</span> <span class="pre">('thrust',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">decreasing'),</span> <span class="pre">12:</span> <span class="pre">('cycle',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">decreasing'),</span> <span class="pre">13:</span> <span class="pre">('twist',</span> <span class="pre">'feel</span> <span class="pre">range',</span> <span class="pre">None,</span> <span class="pre">'Continuous,</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">feel</span> <span class="pre">increasing</span> <span class="pre">to</span> <span class="pre">range</span> <span class="pre">and</span> <span class="pre">decreasing'),</span> <span class="pre">14:</span> <span class="pre">('random',</span> <span class="pre">'random</span> <span class="pre">range',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Random</span> <span class="pre">Levels'),</span> <span class="pre">15:</span> <span class="pre">('step',</span> <span class="pre">'step</span> <span class="pre">delay',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Builds</span> <span class="pre">towards</span> <span class="pre">a</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">slowly'),</span> <span class="pre">16:</span> <span class="pre">('training',</span> <span class="pre">'jump</span> <span class="pre">delay',</span> <span class="pre">'pulse</span> <span class="pre">feel',</span> <span class="pre">'Jumps</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">power</span> <span class="pre">level</span> <span class="pre">quickly')}</span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.beta_modes" title="Link to this definition">¶</a></dt>
+<dd><p>Modes of the beta firmwares (2.119B and later), in the same format as modes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.get_id">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.get_id" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the mode number for a mode name, e.g. “step” is 12 on 2.106 and 15 on beta firmware.</p>
+<p>Raises ValueError for a name the firmware does not have.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.get_mode">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.get_mode" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.get_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the mode based on the integer id.</p>
+<p>A number the firmware does not have returns a mode named “unknown”.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.id_names">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">id_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.id_names" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">id_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.id_names" title="Link to this definition">¶</a></dt>
 <dd><p>returns a dictionary of {modeid: name, …}</p>
 <p>i.e. {0: “pulse”, 1: “bounce”, …}</p>
 </dd></dl>
@@ -249,6 +327,7 @@ The key is the mode id, and the value is a tuple in the format of:
 [1] - Channel C name
 [2] - Channel D name, or none if N/A
 [3] - short description</p>
+<p>These are the 2.106 numbers.  See beta_modes for 2.119B and later.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -275,6 +354,12 @@ The key is the mode id, and the value is a tuple in the format of:
 <dd><p>What channel D modifies, or None if not applicable</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.modes.Estim2pyMode.table">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#estim2py.modes.Estim2pyMode.table" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the mode table for a protocol name.  None or “2.106” gives modes, anything else beta_modes.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -288,8 +373,14 @@ The key is the mode id, and the value is a tuple in the format of:
 <p>Bias: 0 A, 1 B, 2 Average, 3 Max.
 The join field is stored in Estim2pyStatus.linked, so is_linked() means the same on every firmware.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.bias_codes">
+<span class="sig-name descname"><span class="pre">bias_codes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{Estim2pyBias.A:</span> <span class="pre">0,</span> <span class="pre">Estim2pyBias.AVERAGE:</span> <span class="pre">2,</span> <span class="pre">Estim2pyBias.B:</span> <span class="pre">1,</span> <span class="pre">Estim2pyBias.MAX:</span> <span class="pre">3}</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.bias_codes" title="Link to this definition">¶</a></dt>
+<dd><p>The number this firmware uses for each bias setting.  Empty if bias is not supported.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.protocol.Beta2119Protocol.features">
-<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'high_speed',</span> <span class="pre">'output_map',</span> <span class="pre">'step'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.features" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'output_map',</span> <span class="pre">'step',</span> <span class="pre">'version'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2119Protocol.features" title="Link to this definition">¶</a></dt>
 <dd><p>Optional features beyond the common command set.</p>
 </dd></dl>
 
@@ -334,8 +425,14 @@ The join field is stored in Estim2pyStatus.linked, so is_linked() means the same
 Warp: 0-5 for x1 to x32.  Ramp: 0-3 for x1 to x4.
 The join field is stored in Estim2pyStatus.linked, so is_linked() means the same on every firmware.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.bias_codes">
+<span class="sig-name descname"><span class="pre">bias_codes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{Estim2pyBias.A:</span> <span class="pre">1,</span> <span class="pre">Estim2pyBias.AVERAGE:</span> <span class="pre">3,</span> <span class="pre">Estim2pyBias.B:</span> <span class="pre">2,</span> <span class="pre">Estim2pyBias.MAX:</span> <span class="pre">0}</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.bias_codes" title="Link to this definition">¶</a></dt>
+<dd><p>The number this firmware uses for each bias setting.  Empty if bias is not supported.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.protocol.Beta2120Protocol.features">
-<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'output_map',</span> <span class="pre">'ramp',</span> <span class="pre">'step',</span> <span class="pre">'warp'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.features" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({'bias',</span> <span class="pre">'dynamic',</span> <span class="pre">'output_map',</span> <span class="pre">'ramp',</span> <span class="pre">'step',</span> <span class="pre">'version',</span> <span class="pre">'warp'})</span></span><a class="headerlink" href="#estim2py.protocol.Beta2120Protocol.features" title="Link to this definition">¶</a></dt>
 <dd><p>Optional features beyond the common command set.</p>
 </dd></dl>
 
@@ -372,6 +469,34 @@ The join field is stored in Estim2pyStatus.linked, so is_linked() means the same
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyBias">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Estim2pyBias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.protocol.Estim2pyBias" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>Dynamic bias setting, used with dynamic power.</p>
+<p>The firmwares number these differently, so use these names rather than raw numbers.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyBias.A">
+<span class="sig-name descname"><span class="pre">A</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A'</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyBias.A" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyBias.AVERAGE">
+<span class="sig-name descname"><span class="pre">AVERAGE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'average'</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyBias.AVERAGE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyBias.B">
+<span class="sig-name descname"><span class="pre">B</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'B'</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyBias.B" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyBias.MAX">
+<span class="sig-name descname"><span class="pre">MAX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'max'</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyBias.MAX" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.protocol.</span></span><span class="sig-name descname"><span class="pre">Estim2pyProtocol</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
@@ -379,6 +504,26 @@ The join field is stored in Estim2pyStatus.linked, so is_linked() means the same
 <p>A protocol knows how many fields the status line has, how to turn those fields into an
 Estim2pyStatus, and how to spell the commands that differ between firmwares.</p>
 <p>Use detect_protocol() to pick the right one from a raw status line.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.bias_code">
+<span class="sig-name descname"><span class="pre">bias_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.bias_code" title="Link to this definition">¶</a></dt>
+<dd><p>The number this firmware uses for a bias setting.</p>
+<p>Raises Estim2pyUnsupportedError if this firmware has no dynamic bias.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.bias_codes">
+<span class="sig-name descname"><span class="pre">bias_codes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.bias_codes" title="Link to this definition">¶</a></dt>
+<dd><p>The number this firmware uses for each bias setting.  Empty if bias is not supported.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.bias_from_code">
+<span class="sig-name descname"><span class="pre">bias_from_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.bias_from_code" title="Link to this definition">¶</a></dt>
+<dd><p>The bias setting for a number reported by this firmware.</p>
+<p>Raises Estim2pyError for a number this firmware does not use.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.features">
 <span class="sig-name descname"><span class="pre">features</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.features" title="Link to this definition">¶</a></dt>
@@ -389,6 +534,13 @@ Estim2pyStatus, and how to spell the commands that differ between firmwares.</p>
 <dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.field_count">
 <span class="sig-name descname"><span class="pre">field_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.field_count" title="Link to this definition">¶</a></dt>
 <dd><p>Number of colon separated fields in the status line.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.protocol.Estim2pyProtocol.format">
+<span class="sig-name descname"><span class="pre">format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#estim2py.status.Estim2pyStatus" title="estim2py.status.Estim2pyStatus"><span class="pre">Estim2pyStatus</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#estim2py.protocol.Estim2pyProtocol.format" title="Link to this definition">¶</a></dt>
+<dd><p>Return the status line this firmware would send for status, without line ending.</p>
+<p>Fields this firmware reports but status does not have are sent as 0.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -493,12 +645,15 @@ Estim2pyStatus, and how to spell the commands that differ between firmwares.</p>
 <span id="estim2py-simulated-module"></span><h2>estim2py.simulated module<a class="headerlink" href="#module-estim2py.simulated" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.simulated.</span></span><span class="sig-name descname"><span class="pre">Estim2pySimulatedConnection</span></span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">estim2py.simulated.</span></span><span class="sig-name descname"><span class="pre">Estim2pySimulatedConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol" title="estim2py.protocol.Estim2pyProtocol"><span class="pre">Estim2pyProtocol</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'2.106'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#estim2py.connection.Estim2pyConnection" title="estim2py.connection.Estim2pyConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Estim2pyConnection</span></code></a></p>
 <p>This is a sumulated 2B box, so you don’t always have to plug a box in to write code.
 It should behave exactly like the real box.</p>
 <p>If it doesn’t… that’s a bug!</p>
-<p>The interface is exactly like Estim2pyConnection.</p>
+<p>The interface is exactly like Estim2pyConnection.  It replaces only the serial exchange: commands are
+interpreted here and answered with a status line in the format of the simulated firmware.</p>
+<p>keywords:
+protocol - the firmware to simulate: “2.106” (default), “2.119B”, “2.120B” or an Estim2pyProtocol.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.error_on_next">
 <span class="sig-name descname"><span class="pre">error_on_next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">do_throw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.error_on_next" title="Link to this definition">¶</a></dt>
@@ -508,81 +663,22 @@ You can send it False to not error on the next command.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.get_status">
-<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.get_status" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a Estim2pyStatus object</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.high">
-<span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.high" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the box to high power mode and returns Estim2pyStatus</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.kill">
-<span class="sig-name descname"><span class="pre">kill</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.kill" title="Link to this definition">¶</a></dt>
-<dd><p>Sets channels A and B to 0 and returns Estim2pyStatus</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.link">
-<span class="sig-name descname"><span class="pre">link</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.link" title="Link to this definition">¶</a></dt>
-<dd><p>Links the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.low">
-<span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.low" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the box to low power mode and returns Estim2pyStatus</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.reset" title="Link to this definition">¶</a></dt>
-<dd><p>Resets the box and returns Estim2pyStatus</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.reset_status">
 <span class="sig-name descname"><span class="pre">reset_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.reset_status" title="Link to this definition">¶</a></dt>
 <dd><p>Manually reset the status to the default state.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.set_channel">
-<span class="sig-name descname"><span class="pre">set_channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.set_channel" title="Link to this definition">¶</a></dt>
-<dd><p>Set’s the channel to value val.</p>
-<p>Will throw a ValueError if:
-The channel is not a,b,c or d (upper or lowercase)
-The val is notan integer between 0-100 for A and B, 2-100 for C, or 1-100 for D</p>
-<p>args:
-channel (str): A or B for power channels, C for Speed, D for Feeling. (generally)
-val (int): 1-100 for A or B, 2-100 for C, 1-100 for D</p>
-<p>returns:
-Estim2pyStatus</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.set_mode">
-<span class="sig-name descname"><span class="pre">set_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.set_mode" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the mode to the numbered mode and returns Estim2pyStatus.</p>
-<p>Doesn’t accept arguments over 100.  Note that my box only accepts up to 13.
-(I might need an update.)</p>
-<p>args:
-mode_num (int): mode number to set to.</p>
+<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.run_command">
+<span class="sig-name descname"><span class="pre">run_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.run_command" title="Link to this definition">¶</a></dt>
+<dd><p>Change the simulated status the way the box would for one command.</p>
+<p>Like the box, a command it does not know (or “” and V) changes nothing.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.simulate">
 <span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.simulate" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="estim2py.simulated.Estim2pySimulatedConnection.unlink">
-<span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.simulated.Estim2pySimulatedConnection.unlink" title="Link to this definition">¶</a></dt>
-<dd><p>Unlinks the A and B controls and returns Estim2pyStatus.  Note, may not work on 2.106 firmware.</p>
-</dd></dl>
 
 </dd></dl>
 
@@ -630,6 +726,13 @@ This is mostly internal, but may be useful in some circumstances.  Check unit te
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_bias">
+<span class="sig-name descname"><span class="pre">get_bias</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias" title="estim2py.protocol.Estim2pyBias"><span class="pre">Estim2pyBias</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_bias" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the dynamic bias setting, or None if the firmware does not report it.</p>
+<p>Use this rather than the raw bias attribute, the firmwares number the settings differently.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_c">
 <span class="sig-name descname"><span class="pre">get_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_c" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -652,7 +755,13 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.get_mode">
 <span class="sig-name descname"><span class="pre">get_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#estim2py.modes.Estim2pyMode" title="estim2py.modes.Estim2pyMode"><span class="pre">Estim2pyMode</span></a></span></span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.get_mode" title="Link to this definition">¶</a></dt>
 <dd><p>Returns an Estim2pyMode representing the current mode.</p>
-<p>See Estim2pyMode for more information.</p>
+<p>The mode numbers depend on the firmware, see Estim2pyMode for more information.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="estim2py.status.Estim2pyStatus.is_dynamic_power">
+<span class="sig-name descname"><span class="pre">is_dynamic_power</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estim2py.status.Estim2pyStatus.is_dynamic_power" title="Link to this definition">¶</a></dt>
+<dd><p>Returns True if the box is in dynamic power mode (beta firmware only), False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -730,6 +839,7 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.PARITY"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.PARITY</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.STOPBITS"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.STOPBITS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.TERMINATION_CHAR"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.TERMINATION_CHAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.dynamic"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.dynamic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.get_status"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.get_status()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.high"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.high()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.kill"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.kill()</span></code></a></li>
@@ -738,22 +848,32 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.reset"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.reset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_a()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_bias"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_bias()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_c"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_c()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_channel()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_d"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_mode_by_name"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_mode_by_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_output_map"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_output_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_ramp"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_ramp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_to_status"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_to_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.set_warp"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.set_warp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.step_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.step_channel()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.unlink"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.unlink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.connection.Estim2pyConnection.version"><code class="docutils literal notranslate"><span class="pre">Estim2pyConnection.version()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py.exceptions">estim2py.exceptions module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.exceptions.Estim2pyError"><code class="docutils literal notranslate"><span class="pre">Estim2pyError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.exceptions.Estim2pyUnsupportedError"><code class="docutils literal notranslate"><span class="pre">Estim2pyUnsupportedError</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py.modes">estim2py.modes module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.modes.Estim2pyMode"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.beta_modes"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.beta_modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.get_id"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.get_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.get_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.get_mode()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.id_names"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.id_names()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.mid"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.mid</span></code></a></li>
@@ -762,12 +882,14 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.notes"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.notes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.param_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.param_a</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.param_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.param_b</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.modes.Estim2pyMode.table"><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.table()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py.protocol">estim2py.protocol module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.bias_codes"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.bias_codes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.features"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.features</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.field_count"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.field_count</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2119Protocol.join_command"><code class="docutils literal notranslate"><span class="pre">Beta2119Protocol.join_command()</span></code></a></li>
@@ -777,6 +899,7 @@ The value is what is displayed on the LCD, which is half of that reported on the
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.bias_codes"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.bias_codes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.features"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.features</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.field_count"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.field_count</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.join_command"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.join_command()</span></code></a></li>
@@ -785,9 +908,20 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Beta2120Protocol.version_pattern"><code class="docutils literal notranslate"><span class="pre">Beta2120Protocol.version_pattern</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias"><code class="docutils literal notranslate"><span class="pre">Estim2pyBias</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias.A"><code class="docutils literal notranslate"><span class="pre">Estim2pyBias.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias.AVERAGE"><code class="docutils literal notranslate"><span class="pre">Estim2pyBias.AVERAGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias.B"><code class="docutils literal notranslate"><span class="pre">Estim2pyBias.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyBias.MAX"><code class="docutils literal notranslate"><span class="pre">Estim2pyBias.MAX</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.bias_code"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.bias_code()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.bias_codes"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.bias_codes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.bias_from_code"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.bias_from_code()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.features"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.features</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.field_count"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.field_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.format"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.format()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.join_command"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.join_command()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.name"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.protocol.Estim2pyProtocol.parse"><code class="docutils literal notranslate"><span class="pre">Estim2pyProtocol.parse()</span></code></a></li>
@@ -812,17 +946,9 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l2"><a class="reference internal" href="#module-estim2py.simulated">estim2py.simulated module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.error_on_next"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.error_on_next()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.get_status"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.get_status()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.high"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.high()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.kill"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.kill()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.link"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.link()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.low"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.low()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.reset"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.reset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.reset_status"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.reset_status()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.set_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.set_channel()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.set_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.set_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.run_command"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.run_command()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.simulate"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.simulate()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estim2py.simulated.Estim2pySimulatedConnection.unlink"><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection.unlink()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -834,10 +960,12 @@ The value is what is displayed on the LCD, which is half of that reported on the
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.from_binary"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.from_binary()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_a"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_a()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_b"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_bias"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_bias()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_c"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_c()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_channel"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_channel()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_d"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.get_mode"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_mode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_dynamic_power"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_dynamic_power()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_high_power"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_high_power()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_linked"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_linked()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#estim2py.status.Estim2pyStatus.is_low_power"><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.is_low_power()</span></code></a></li>

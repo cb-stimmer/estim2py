@@ -2,7 +2,12 @@ import logging
 
 import pytest
 
-from estim2py import Estim2pyError, Estim2pyStatus
+from estim2py import (
+    Estim2pyBias,
+    Estim2pyError,
+    Estim2pyStatus,
+    Estim2pyUnsupportedError,
+)
 from estim2py.protocol import (
     Beta2119Protocol,
     Beta2120Protocol,
@@ -145,3 +150,60 @@ def test_supports():
     assert not Beta2119Protocol().supports("teleport")
     assert Beta2120Protocol().supports("warp")
     assert not Beta2120Protocol().supports("high_speed")
+
+@pytest.mark.parametrize("line", [LEGACY_LINE, BETA_LINE, BETA_2120_LINE, BOX_2131_LINE,
+                                  b'344:10:12:120:116:15:D:3:1:2:5:3:2.120B\n'])
+def test_format_round_trips(line):
+    s = Estim2pyStatus.from_binary(line)
+    assert str(s) == line.decode().strip()
+    assert bytes(s) == line.strip()
+
+def test_format_fills_missing_beta_fields_with_zero():
+    s = Estim2pyStatus(230, 0, 0, 100, 100, 0, "L", 0, "2.120B", protocol="2.120B")
+    assert str(s) == "230:0:0:100:100:0:L:0:0:0:0:0:2.120B"
+
+def test_hand_built_status_formats_as_legacy():
+    s = Estim2pyStatus(230, 0, 0, 100, 100, 0, "L", 0, "2.106")
+    assert str(s) == "230:0:0:100:100:0:L:0:2.106"
+
+@pytest.mark.parametrize("protocol,codes", [
+    (Beta2119Protocol(), {Estim2pyBias.A: 0, Estim2pyBias.B: 1, Estim2pyBias.AVERAGE: 2, Estim2pyBias.MAX: 3}),
+    (Beta2120Protocol(), {Estim2pyBias.MAX: 0, Estim2pyBias.A: 1, Estim2pyBias.B: 2, Estim2pyBias.AVERAGE: 3})])
+def test_bias_codes(protocol, codes):
+    for bias, code in codes.items():
+        assert protocol.bias_code(bias) == code
+        assert protocol.bias_from_code(code) == bias
+
+def test_legacy_has_no_bias():
+    with pytest.raises(Estim2pyUnsupportedError):
+        _ = Legacy2106Protocol().bias_code(Estim2pyBias.A)
+
+def test_unknown_bias_code():
+    with pytest.raises(Estim2pyError):
+        _ = Beta2120Protocol().bias_from_code(7)
+
+def test_get_bias_depends_on_protocol():
+    assert Estim2pyStatus.from_binary(b'344:0:0:100:100:0:L:0:0:0:2.119B\n').get_bias() == Estim2pyBias.A
+    assert Estim2pyStatus.from_binary(b'344:0:0:100:100:0:L:0:0:0:0:0:2.120B\n').get_bias() == Estim2pyBias.MAX
+    assert Estim2pyStatus.from_binary(LEGACY_LINE).get_bias() is None
+
+def test_is_dynamic_power():
+    assert Estim2pyStatus.from_binary(b'344:0:0:100:100:0:D:0:0:0:0:0:2.120B\n').is_dynamic_power()
+    assert not Estim2pyStatus.from_binary(LEGACY_LINE).is_dynamic_power()
+
+def test_get_mode_uses_protocol_numbering():
+    assert Estim2pyStatus.from_binary(BETA_2120_LINE).get_mode().name == "step"
+    assert Estim2pyStatus.from_binary(b'666:0:0:100:100:12:L:0:2.106\n').get_mode().name == "step"
+
+def test_equality_compares_beta_fields_when_both_have_them():
+    a = Estim2pyStatus.from_binary(b'344:0:0:100:100:0:L:0:0:0:0:0:2.120B\n')
+    b = Estim2pyStatus.from_binary(b'344:0:0:100:100:0:L:0:0:0:3:0:2.120B\n')
+    legacy = Estim2pyStatus.from_binary(b'666:0:0:100:100:0:L:0:2.106\n')
+    assert a != b
+    assert a.changes(b) == ("warp",)
+    assert a == legacy
+    assert b == legacy
+
+def test_repr_shows_beta_fields():
+    assert "self.warp=0" in repr(Estim2pyStatus.from_binary(BETA_2120_LINE))
+    assert "warp" not in repr(Estim2pyStatus.from_binary(LEGACY_LINE))

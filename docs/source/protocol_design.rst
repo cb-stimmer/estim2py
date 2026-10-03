@@ -1,10 +1,10 @@
 Design: Supporting the New 2B Firmware Protocols
 ================================================
 
-*Design proposal, 2026-10-03. Status: steps 1 and 2 of the rollout are
+*Design proposal, 2026-10-03. Status: steps 1–3 of the rollout are
 implemented (see* :mod:`estim2py.protocol` *and*
-:class:`estim2py.connection.Estim2pyConnection` *); steps 3 and 4 are
-proposed.*
+:class:`estim2py.connection.Estim2pyConnection` *); step 4 (user docs and
+release) is still to do.*
 
 Summary
 -------
@@ -251,7 +251,8 @@ line.
 Behaviour differences
 ~~~~~~~~~~~~~~~~~~~~~
 
-Changing power level resets other settings differently. Seen on hardware:
+Changing power level resets other settings differently, and setting a mode
+resets the channels. Seen on hardware:
 
 .. list-table::
    :header-rows: 1
@@ -266,8 +267,15 @@ Changing power level resets other settings differently. Seen on hardware:
    * - ``L`` (to low)
      - A and B to 0, C and D back to 100
      - A and B to 0, C and D kept
+   * - ``Y`` (to dynamic)
+     - —
+     - A and B to 0 (they were already 0 in the test), bias to 0 (Max)
+   * - ``Mnn`` (new mode)
+     - C and D back to 100
+     - C and D back to 100; link, bias, output map, warp and ramp kept
 
-The 2.106 column comes from the expectations in the existing hardware tests.
+The 2.106 column comes from the existing tests. The simulator follows this
+table; for 2.119B it assumes the 2.131B behaviour.
 
 Detection strategy
 ------------------
@@ -350,23 +358,29 @@ package knows field positions.
        the menu
      - 2 (done)
    * - ``connection.py``
-     - New methods gated by ``protocol.supports(feature)``
-     - 3
+     - New methods gated by ``protocol.supports(feature)``, and a
+       firmware-aware ``set_to_status()``
+     - 3 (done)
+   * - ``protocol.py``
+     - ``Estim2pyBias`` and each protocol's bias numbering;
+       ``format(status)`` writes a status line in the protocol's format
+     - 3 (done)
    * - ``simulated.py``
-     - Has a 2.106 ``protocol`` attribute (step 2).
-       ``Estim2pySimulatedConnection(protocol="2.106")`` simulates any
-       firmware, including the power-change differences
-     - 3
+     - ``Estim2pySimulatedConnection(protocol="2.106")`` simulates any
+       firmware. It replaces only the serial exchange: commands are
+       interpreted and answered with a status line, so the simulator runs
+       the real connection code, including the `Behaviour differences`_
+     - 3 (done)
    * - ``modes.py``
-     - One mode table per mode numbering (2.106, and 2.119B and later),
-       keyed by mode number. ``Estim2pyStatus.get_mode()`` looks up the table
-       for ``self.protocol``; an unknown number returns an "unknown" mode
-       instead of raising ``KeyError``
-     - 3
+     - ``Estim2pyMode.modes`` (2.106) and ``beta_modes`` (2.119B and later).
+       ``get_mode()``, ``get_id()`` and ``id_names()`` take a protocol name;
+       ``Estim2pyStatus.get_mode()`` uses the status's protocol. An unknown
+       number returns an "unknown" mode instead of raising ``KeyError``
+     - 3 (done)
    * - ``exceptions.py``
      - ``Estim2pyUnsupportedError(Estim2pyError)`` for a feature the firmware
        lacks
-     - 3
+     - 3 (done)
 
 Each protocol class declares its field count, power letters, optional features
 and version pattern, and implements ``_build()`` (fields to status) and
@@ -399,7 +413,7 @@ beta box the same calls just work, and the new features are opt-in methods.
    * - ``dynamic()``
      - ``Y``
      - Raises ``Estim2pyUnsupportedError``
-   * - ``set_bias(bias)`` (an ``IntEnum``: A, B, Average, Max)
+   * - ``set_bias(bias)`` (``Estim2pyBias.A``, ``B``, ``AVERAGE``, ``MAX``)
      - ``Qn``, number from the protocol's bias numbering
      - Raises
    * - ``set_output_map(n)`` (0–2)
@@ -422,24 +436,29 @@ beta box the same calls just work, and the new features are opt-in methods.
      - Works everywhere
 
 Because the bias numbering differs between 2.119B and 2.120B, ``set_bias()``
-takes a named value rather than a raw number, and the status should offer a
-matching ``get_bias()`` that translates ``status.bias`` through the protocol.
+takes an ``Estim2pyBias`` rather than a raw number, and ``status.get_bias()``
+translates the raw ``status.bias`` through the status's protocol.
 
 Status additions: ``status.bias``, ``status.output_map``, ``status.warp``,
 ``status.ramp``, ``status.protocol`` (``None`` where the firmware does not
-report them) and ``is_dynamic_power()``. ``__eq__`` should compare the new
-fields only when both sides have them, so 2.106 comparisons are unchanged.
+report them), ``get_bias()`` and ``is_dynamic_power()``. ``__eq__`` and
+``changes()`` compare the new fields only when both sides have them, so 2.106
+comparisons are unchanged.
 
-Three existing behaviours need small fixes:
+Existing behaviour that changed in step 3:
 
-- ``Estim2pyStatus.__str__`` and ``__bytes__`` currently always emit a 9-field
-  line; they should emit the line for ``self.protocol``, so
-  ``from_binary(bytes(status))`` round-trips on every protocol.
-- ``set_to_status()`` picks high or low power only; it should also handle
-  ``D`` and, on beta firmware, apply bias, output map, warp and ramp.
-- ``set_mode(n)`` keeps sending the raw number, but ``set_to_status()`` should
-  set the mode by name when the status came from a firmware with a different
-  mode numbering.
+- ``Estim2pyStatus.__str__`` and ``__bytes__`` write the line for
+  ``self.protocol`` (2.106 when unknown) with the real battery and version, so
+  ``from_binary(bytes(status))`` round-trips on every protocol. They used to
+  write a 9-field line with a fixed battery of 230 and version 0.2.3.
+- ``set_to_status()`` handles ``D`` power; on beta firmware it sets link, and
+  bias, output map, warp and ramp where both firmwares have them. When the
+  status comes from a firmware with a different mode numbering it sets the
+  mode by name, and raises ``ValueError`` if this firmware lacks that mode.
+  It no longer changes the status passed in (it used to set its ``linked``
+  to 0); on 2.106 it still expects link to be off.
+- ``set_mode(n)`` keeps sending the raw number; ``set_mode_by_name()`` is the
+  firmware-independent way.
 
 The 2.119B ``Z`` high-speed command is left out: it changes the serial baud
 rate under the connection, needs ``E`` or a power cycle to undo, and was
@@ -456,21 +475,25 @@ parsing work on raw byte strings.
 - **Detection (done):** 9 fields → 2.106, 11 → 2.119B, 13 → 2.120B; other
   counts and non-status replies raise ``Estim2pyError`` carrying the raw line;
   a version mismatch logs a warning.
-- **Round trip:** ``from_binary(bytes(status)) == status`` for every protocol.
+- **Round trip (done):** ``str(status)`` reproduces the line it was parsed
+  from, for every protocol.
 - **Connection without a port (done):** mock ``serial.Serial`` so ``read_until``
   returns a canned line, and assert the bytes written (``J``/``U`` vs
   ``J1``/``J0``, ``Qn``, ``On``, ``Wn``, ``Rn``), the retry-once behaviour and
   ``ERR`` handling.
-- **Simulator:** run the existing simulated-connection tests against every
-  protocol with ``pytest.mark.parametrize``.
+- **Simulator (done):** the existing simulator tests still pass on 2.106;
+  new tests run every simulated firmware, including ``set_to_status()`` from
+  each firmware to each other one.
 - **Hardware (done):** the expected replies in the hardware tests depend on
   ``con.protocol``: what ``L`` does to C and D (see `Behaviour
   differences`_), and modes above 13 and linking, which are expected
-  failures on 2.106 only. All pass on the 2.131B box.
+  failures on 2.106 only. A beta-settings test checks the new commands and
+  the simulator's assumptions with A and B kept at 0. All pass on the 2.131B
+  box.
   ``test_timeout`` still needs a look: it uses a ``con`` it never creates, so
   it fails with an ``AttributeError`` and is reported as an expected failure
   for the wrong reason.
-- **Modes:** every number in both mode tables resolves to the expected name,
+- **Modes (done):** every number in both mode tables resolves to the expected name,
   and ``set_mode_by_name("step")`` sends ``M12`` on 2.106 and ``M15`` on beta
   firmware.
 
@@ -503,7 +526,7 @@ Rollout, one pull request each:
 2. **Done.** Wire ``protocol=`` and detection into ``Estim2pyConnection``, switch
    ``link()``/``unlink()`` to ``join_command()``, handle ``ERR`` and empty
    replies, and make the hardware tests protocol-aware.
-3. Add the beta-only methods, ``get_bias()``/``set_bias()``, the remaining
-   status changes, per-firmware mode tables and simulator support.
+3. **Done.** Add the beta-only methods, ``get_bias()``/``set_bias()``, the
+   remaining status changes, per-firmware mode tables and simulator support.
 4. Update the user docs and release as 0.4.0 (new public API, nothing
    removed).

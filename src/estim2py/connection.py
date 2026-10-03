@@ -1,11 +1,13 @@
+import copy
 from typing import Literal
 
 import serial  # pyright: ignore[reportMissingModuleSource]
 import time
 import logging
 
-from .exceptions import Estim2pyError
-from .protocol import Estim2pyProtocol, detect_protocol, get_protocol, split_status
+from .exceptions import Estim2pyError, Estim2pyUnsupportedError
+from .modes import Estim2pyMode
+from .protocol import Estim2pyBias, Estim2pyProtocol, detect_protocol, get_protocol, split_status
 from .status import Estim2pyStatus
 
 logger = logging.getLogger(__name__)
@@ -86,38 +88,66 @@ class Estim2pyConnection():
     def set_to_status(self, to_status: Estim2pyStatus) -> bool:
         """Change all settings to the input status. Returns a success boolean.
 
-        This will cowardly set the link to 0 before trying to send all the statuses
-        Until I figure out what is wrong with channel link.
+        The status may come from a box with different firmware: the mode is then set by name, and the
+        bias by setting.  Settings this firmware does not have are skipped.
+
+        On 2.106 firmware this will cowardly leave link alone and expect it off,
+        until I figure out what is wrong with channel link there.
         
         args:
         to_status (Estim2pyStatus): target status.
 
         returns:
         True if all parameters were set, false if there was a mismatch.
-        """
 
+        raises:
+        ValueError if the status is in a mode this firmware does not have (e.g. flo on 2.106).
+        """
+        expected = copy.copy(to_status)
+        expected.protocol = self.protocol.name
 
         if to_status.is_high_power():
             _ = self.high()
+        elif to_status.is_dynamic_power():
+            _ = self.dynamic()
         else:
             _ = self.low()
 
-        logger.debug("Cowardly setting linked to 0 because of link bug.")
-        to_status.linked = 0
-        # if (to_status.linked == 0): self.unlink else: self.link
+        if self.protocol.name == "2.106":
+            logger.debug("Cowardly expecting linked to be 0 because of link bug.")
+            expected.linked = 0
+        elif to_status.is_linked():
+            _ = self.link()
+        else:
+            _ = self.unlink()
 
-        _ = self.set_mode(to_status.mode)
-        
+        if Estim2pyMode.table(to_status.protocol) is Estim2pyMode.table(self.protocol.name):
+            _ = self.set_mode(to_status.mode)
+        else:
+            name = Estim2pyMode.get_mode(to_status.mode, to_status.protocol).name
+            logger.debug(f"Mode {to_status.mode} of firmware {to_status.protocol} is {name!r} here.")
+            expected.mode = self.set_mode_by_name(name).mode
+
+        bias = to_status.get_bias()
+        if bias is not None and self.protocol.supports("bias"):
+            expected.bias = self.set_bias(bias).bias
+        if to_status.output_map is not None and self.protocol.supports("output_map"):
+            _ = self.set_output_map(to_status.output_map)
+        if to_status.warp is not None and self.protocol.supports("warp"):
+            _ = self.set_warp(to_status.warp)
+        if to_status.ramp is not None and self.protocol.supports("ramp"):
+            _ = self.set_ramp(to_status.ramp)
+
         _ = self.set_channel('a', to_status.get_channel('a'))
         _ = self.set_channel('b', to_status.get_channel('b'))
         _ = self.set_channel('c', to_status.get_channel('c'))
         _ = self.set_channel('d', to_status.get_channel('d'))
 
         current_status = self.get_status()
-        result = current_status == to_status
+        result = current_status == expected
 
         if not result:
-            logger.warn(f"Estim2pyConneciton.set_to_status() failed.\nCurrent: {current_status=}\nTarget : {to_status}")  
+            logger.warning(f"Estim2pyConnection.set_to_status() failed.\nCurrent: {current_status=}\nTarget : {expected}")
         
         return result
         
@@ -185,17 +215,73 @@ class Estim2pyConnection():
         """Sets channels A and B to 0 and returns Estim2pyStatus"""
         return self.__send("K")
 
+    def dynamic(self) -> Estim2pyStatus:
+        """Sets the box to dynamic power mode and returns Estim2pyStatus.  Beta firmware only."""
+        self.__require("dynamic", "Dynamic power")
+        return self.__send("Y")
+
+    def set_bias(self, bias: Estim2pyBias) -> Estim2pyStatus:
+        """Sets the dynamic bias (used with dynamic power) and returns Estim2pyStatus.  Beta firmware only.
+
+        args:
+        bias (Estim2pyBias): A, B, AVERAGE or MAX.  The firmwares number these differently, this sends the right number.
+        """
+        self.__require("bias", "Dynamic bias")
+        return self.__send("Q"+str(self.protocol.bias_code(bias)))
+
+    def set_output_map(self, output_map: int) -> Estim2pyStatus:
+        """Sets the output map (0 Map A, 1 Map B, 2 Map C) and returns Estim2pyStatus.  Beta firmware only."""
+        self.__require("output_map", "Output map")
+        if output_map not in range(3): raise ValueError(f"output map out of range [0-2] was {output_map}")
+        return self.__send("O"+str(output_map))
+
+    def step_channel(self, channel: ChannelName, direction: int) -> Estim2pyStatus:
+        """Raises (direction 1) or lowers (direction -1) a channel by 1 and returns Estim2pyStatus.  Beta firmware only."""
+        self.__require("step", "Stepping a channel")
+        channel = channel.upper()
+        if channel not in ['A', 'B', 'C', 'D']: raise ValueError(f"channel argument must be A, B, C, D. was {channel!r}")
+        if direction not in (1, -1): raise ValueError(f"direction must be 1 or -1. was {direction}")
+        return self.__send(channel + ("+" if direction == 1 else "-"))
+
+    def set_warp(self, warp: int) -> Estim2pyStatus:
+        """Sets the time warp factor (0-5 for x1 to x32) and returns Estim2pyStatus.  2.120B firmware and later."""
+        self.__require("warp", "Warp factor")
+        if warp not in range(6): raise ValueError(f"warp out of range [0-5] was {warp}")
+        return self.__send("W"+str(warp))
+
+    def set_ramp(self, ramp: int) -> Estim2pyStatus:
+        """Sets the ramp step (0-3 for x1 to x4) and returns Estim2pyStatus.  2.120B firmware and later."""
+        self.__require("ramp", "Ramp step")
+        if ramp not in range(4): raise ValueError(f"ramp out of range [0-3] was {ramp}")
+        return self.__send("R"+str(ramp))
+
+    def version(self) -> Estim2pyStatus:
+        """Asks the box for its version and returns Estim2pyStatus.  Without a version command (2.106) this is get_status()."""
+        if not self.protocol.supports("version"):
+            return self.get_status()
+        return self.__send("V")
+
     def set_mode(self, mode_num: int) -> Estim2pyStatus:
         """Sets the mode to the numbered mode and returns Estim2pyStatus.
 
-        Doesn't accept arguments over 100.  Note that my box only accepts up to 13.
-        (I might need an update.)
+        Doesn't accept arguments over 100.  2.106 has modes 0-13, beta firmware 0-16, and the
+        numbers mean different modes.  set_mode_by_name() works on every firmware.
 
         args:
         mode_num (int): mode number to set to.
         """
         if (mode_num < 0 or mode_num > self.MODE_MAX): raise ValueError("invalid mode number")
         return self.__send("M"+str(mode_num))
+
+    def set_mode_by_name(self, name: str) -> Estim2pyStatus:
+        """Sets the mode by name, e.g. "step", using this firmware's mode numbers.  Returns Estim2pyStatus.
+
+        Raises ValueError for a mode this firmware does not have.  See Estim2pyMode for the names."""
+        return self.set_mode(Estim2pyMode.get_id(name, self.protocol.name))
+
+    def __require(self, feature: str, what: str) -> None:
+        if not self.protocol.supports(feature):
+            raise Estim2pyUnsupportedError(f"{what} is not supported by firmware {self.protocol.name}.")
     
     def __receive(self) -> bytes:
         logger.debug(f"Getting all input until a [{self.TERMINATION_CHAR}]. If things are broken here, this is the problem.")
@@ -205,7 +291,7 @@ class Estim2pyConnection():
         logger.info(f"Received: {input.decode("ascii")}")
         return input
 
-    def __exchange(self, out: str) -> bytes:
+    def _exchange(self, out: str) -> bytes:
         """Send one command and return the raw reply.  Resends once if the box reports a buffer overrun."""
         for attempt in range(2):
             command = out+"\r" # thank you STPIHKAL https://buttplug.io/stpihkal/protocols/estim-systems/
@@ -232,7 +318,7 @@ class Estim2pyConnection():
         """Ask the box for its status and return the matching protocol.  Tries twice."""
         error = Estim2pyError("No reply from 2B.  Is it switched on and out of its menu?")
         for attempt in range(2):
-            reply = self.__exchange("")
+            reply = self._exchange("")
             if not reply.strip():
                 logger.warning(f"No reply from 2B while detecting the protocol, attempt {attempt + 1} of 2")
                 continue
@@ -244,7 +330,7 @@ class Estim2pyConnection():
         raise error
 
     def __send(self, out: str) -> Estim2pyStatus:
-        reply = self.__exchange(out)
+        reply = self._exchange(out)
         if not reply.strip():
             raise Estim2pyError("No reply from 2B.  Is it switched on and out of its menu?", out)
         return self.protocol.parse(split_status(reply))

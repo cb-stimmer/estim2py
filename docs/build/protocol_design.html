@@ -34,10 +34,10 @@
             
   <section id="design-supporting-the-new-2b-firmware-protocols">
 <h1>Design: Supporting the New 2B Firmware Protocols<a class="headerlink" href="#design-supporting-the-new-2b-firmware-protocols" title="Link to this heading">¶</a></h1>
-<p><em>Design proposal, 2026-10-03. Status: steps 1 and 2 of the rollout are
+<p><em>Design proposal, 2026-10-03. Status: steps 1–3 of the rollout are
 implemented (see</em> <a class="reference internal" href="estim2py.html#module-estim2py.protocol" title="estim2py.protocol"><code class="xref py py-mod docutils literal notranslate"><span class="pre">estim2py.protocol</span></code></a> <em>and</em>
-<a class="reference internal" href="estim2py.html#estim2py.connection.Estim2pyConnection" title="estim2py.connection.Estim2pyConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">estim2py.connection.Estim2pyConnection</span></code></a> <em>); steps 3 and 4 are
-proposed.</em></p>
+<a class="reference internal" href="estim2py.html#estim2py.connection.Estim2pyConnection" title="estim2py.connection.Estim2pyConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">estim2py.connection.Estim2pyConnection</span></code></a> <em>); step 4 (user docs and
+release) is still to do.</em></p>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
 <p>Add a small protocol layer so <code class="docutils literal notranslate"><span class="pre">Estim2pyConnection</span></code> works with the original
@@ -345,7 +345,8 @@ line.</p>
 </section>
 <section id="behaviour-differences">
 <h3>Behaviour differences<a class="headerlink" href="#behaviour-differences" title="Link to this heading">¶</a></h3>
-<p>Changing power level resets other settings differently. Seen on hardware:</p>
+<p>Changing power level resets other settings differently, and setting a mode
+resets the channels. Seen on hardware:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 30.0%" />
@@ -367,9 +368,18 @@ line.</p>
 <td><p>A and B to 0, C and D back to 100</p></td>
 <td><p>A and B to 0, C and D kept</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Y</span></code> (to dynamic)</p></td>
+<td><p>—</p></td>
+<td><p>A and B to 0 (they were already 0 in the test), bias to 0 (Max)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Mnn</span></code> (new mode)</p></td>
+<td><p>C and D back to 100</p></td>
+<td><p>C and D back to 100; link, bias, output map, warp and ramp kept</p></td>
+</tr>
 </tbody>
 </table>
-<p>The 2.106 column comes from the expectations in the existing hardware tests.</p>
+<p>The 2.106 column comes from the existing tests. The simulator follows this
+table; for 2.119B it assumes the 2.131B behaviour.</p>
 </section>
 </section>
 <section id="detection-strategy">
@@ -459,26 +469,33 @@ the menu</p></td>
 <td><p>2 (done)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">connection.py</span></code></p></td>
-<td><p>New methods gated by <code class="docutils literal notranslate"><span class="pre">protocol.supports(feature)</span></code></p></td>
-<td><p>3</p></td>
+<td><p>New methods gated by <code class="docutils literal notranslate"><span class="pre">protocol.supports(feature)</span></code>, and a
+firmware-aware <code class="docutils literal notranslate"><span class="pre">set_to_status()</span></code></p></td>
+<td><p>3 (done)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">simulated.py</span></code></p></td>
-<td><p>Has a 2.106 <code class="docutils literal notranslate"><span class="pre">protocol</span></code> attribute (step 2).
-<code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection(protocol=&quot;2.106&quot;)</span></code> simulates any
-firmware, including the power-change differences</p></td>
-<td><p>3</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">protocol.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Estim2pyBias</span></code> and each protocol’s bias numbering;
+<code class="docutils literal notranslate"><span class="pre">format(status)</span></code> writes a status line in the protocol’s format</p></td>
+<td><p>3 (done)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">modes.py</span></code></p></td>
-<td><p>One mode table per mode numbering (2.106, and 2.119B and later),
-keyed by mode number. <code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_mode()</span></code> looks up the table
-for <code class="docutils literal notranslate"><span class="pre">self.protocol</span></code>; an unknown number returns an “unknown” mode
-instead of raising <code class="docutils literal notranslate"><span class="pre">KeyError</span></code></p></td>
-<td><p>3</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">simulated.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Estim2pySimulatedConnection(protocol=&quot;2.106&quot;)</span></code> simulates any
+firmware. It replaces only the serial exchange: commands are
+interpreted and answered with a status line, so the simulator runs
+the real connection code, including the <a class="reference internal" href="#behaviour-differences">Behaviour differences</a></p></td>
+<td><p>3 (done)</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">exceptions.py</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">modes.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Estim2pyMode.modes</span></code> (2.106) and <code class="docutils literal notranslate"><span class="pre">beta_modes</span></code> (2.119B and later).
+<code class="docutils literal notranslate"><span class="pre">get_mode()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_id()</span></code> and <code class="docutils literal notranslate"><span class="pre">id_names()</span></code> take a protocol name;
+<code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.get_mode()</span></code> uses the status’s protocol. An unknown
+number returns an “unknown” mode instead of raising <code class="docutils literal notranslate"><span class="pre">KeyError</span></code></p></td>
+<td><p>3 (done)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">exceptions.py</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">Estim2pyUnsupportedError(Estim2pyError)</span></code> for a feature the firmware
 lacks</p></td>
-<td><p>3</p></td>
+<td><p>3 (done)</p></td>
 </tr>
 </tbody>
 </table>
@@ -516,7 +533,7 @@ beta box the same calls just work, and the new features are opt-in methods.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">Y</span></code></p></td>
 <td><p>Raises <code class="docutils literal notranslate"><span class="pre">Estim2pyUnsupportedError</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">set_bias(bias)</span></code> (an <code class="docutils literal notranslate"><span class="pre">IntEnum</span></code>: A, B, Average, Max)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">set_bias(bias)</span></code> (<code class="docutils literal notranslate"><span class="pre">Estim2pyBias.A</span></code>, <code class="docutils literal notranslate"><span class="pre">B</span></code>, <code class="docutils literal notranslate"><span class="pre">AVERAGE</span></code>, <code class="docutils literal notranslate"><span class="pre">MAX</span></code>)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">Qn</span></code>, number from the protocol’s bias numbering</p></td>
 <td><p>Raises</p></td>
 </tr>
@@ -547,22 +564,27 @@ beta box the same calls just work, and the new features are opt-in methods.</p>
 </tbody>
 </table>
 <p>Because the bias numbering differs between 2.119B and 2.120B, <code class="docutils literal notranslate"><span class="pre">set_bias()</span></code>
-takes a named value rather than a raw number, and the status should offer a
-matching <code class="docutils literal notranslate"><span class="pre">get_bias()</span></code> that translates <code class="docutils literal notranslate"><span class="pre">status.bias</span></code> through the protocol.</p>
+takes an <code class="docutils literal notranslate"><span class="pre">Estim2pyBias</span></code> rather than a raw number, and <code class="docutils literal notranslate"><span class="pre">status.get_bias()</span></code>
+translates the raw <code class="docutils literal notranslate"><span class="pre">status.bias</span></code> through the status’s protocol.</p>
 <p>Status additions: <code class="docutils literal notranslate"><span class="pre">status.bias</span></code>, <code class="docutils literal notranslate"><span class="pre">status.output_map</span></code>, <code class="docutils literal notranslate"><span class="pre">status.warp</span></code>,
 <code class="docutils literal notranslate"><span class="pre">status.ramp</span></code>, <code class="docutils literal notranslate"><span class="pre">status.protocol</span></code> (<code class="docutils literal notranslate"><span class="pre">None</span></code> where the firmware does not
-report them) and <code class="docutils literal notranslate"><span class="pre">is_dynamic_power()</span></code>. <code class="docutils literal notranslate"><span class="pre">__eq__</span></code> should compare the new
-fields only when both sides have them, so 2.106 comparisons are unchanged.</p>
-<p>Three existing behaviours need small fixes:</p>
+report them), <code class="docutils literal notranslate"><span class="pre">get_bias()</span></code> and <code class="docutils literal notranslate"><span class="pre">is_dynamic_power()</span></code>. <code class="docutils literal notranslate"><span class="pre">__eq__</span></code> and
+<code class="docutils literal notranslate"><span class="pre">changes()</span></code> compare the new fields only when both sides have them, so 2.106
+comparisons are unchanged.</p>
+<p>Existing behaviour that changed in step 3:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.__str__</span></code> and <code class="docutils literal notranslate"><span class="pre">__bytes__</span></code> currently always emit a 9-field
-line; they should emit the line for <code class="docutils literal notranslate"><span class="pre">self.protocol</span></code>, so
-<code class="docutils literal notranslate"><span class="pre">from_binary(bytes(status))</span></code> round-trips on every protocol.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">set_to_status()</span></code> picks high or low power only; it should also handle
-<code class="docutils literal notranslate"><span class="pre">D</span></code> and, on beta firmware, apply bias, output map, warp and ramp.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">set_mode(n)</span></code> keeps sending the raw number, but <code class="docutils literal notranslate"><span class="pre">set_to_status()</span></code> should
-set the mode by name when the status came from a firmware with a different
-mode numbering.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Estim2pyStatus.__str__</span></code> and <code class="docutils literal notranslate"><span class="pre">__bytes__</span></code> write the line for
+<code class="docutils literal notranslate"><span class="pre">self.protocol</span></code> (2.106 when unknown) with the real battery and version, so
+<code class="docutils literal notranslate"><span class="pre">from_binary(bytes(status))</span></code> round-trips on every protocol. They used to
+write a 9-field line with a fixed battery of 230 and version 0.2.3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_to_status()</span></code> handles <code class="docutils literal notranslate"><span class="pre">D</span></code> power; on beta firmware it sets link, and
+bias, output map, warp and ramp where both firmwares have them. When the
+status comes from a firmware with a different mode numbering it sets the
+mode by name, and raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if this firmware lacks that mode.
+It no longer changes the status passed in (it used to set its <code class="docutils literal notranslate"><span class="pre">linked</span></code>
+to 0); on 2.106 it still expects link to be off.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_mode(n)</span></code> keeps sending the raw number; <code class="docutils literal notranslate"><span class="pre">set_mode_by_name()</span></code> is the
+firmware-independent way.</p></li>
 </ul>
 <p>The 2.119B <code class="docutils literal notranslate"><span class="pre">Z</span></code> high-speed command is left out: it changes the serial baud
 rate under the connection, needs <code class="docutils literal notranslate"><span class="pre">E</span></code> or a power cycle to undo, and was
@@ -578,21 +600,25 @@ parsing work on raw byte strings.</p>
 <li><p><strong>Detection (done):</strong> 9 fields → 2.106, 11 → 2.119B, 13 → 2.120B; other
 counts and non-status replies raise <code class="docutils literal notranslate"><span class="pre">Estim2pyError</span></code> carrying the raw line;
 a version mismatch logs a warning.</p></li>
-<li><p><strong>Round trip:</strong> <code class="docutils literal notranslate"><span class="pre">from_binary(bytes(status))</span> <span class="pre">==</span> <span class="pre">status</span></code> for every protocol.</p></li>
+<li><p><strong>Round trip (done):</strong> <code class="docutils literal notranslate"><span class="pre">str(status)</span></code> reproduces the line it was parsed
+from, for every protocol.</p></li>
 <li><p><strong>Connection without a port (done):</strong> mock <code class="docutils literal notranslate"><span class="pre">serial.Serial</span></code> so <code class="docutils literal notranslate"><span class="pre">read_until</span></code>
 returns a canned line, and assert the bytes written (<code class="docutils literal notranslate"><span class="pre">J</span></code>/<code class="docutils literal notranslate"><span class="pre">U</span></code> vs
 <code class="docutils literal notranslate"><span class="pre">J1</span></code>/<code class="docutils literal notranslate"><span class="pre">J0</span></code>, <code class="docutils literal notranslate"><span class="pre">Qn</span></code>, <code class="docutils literal notranslate"><span class="pre">On</span></code>, <code class="docutils literal notranslate"><span class="pre">Wn</span></code>, <code class="docutils literal notranslate"><span class="pre">Rn</span></code>), the retry-once behaviour and
 <code class="docutils literal notranslate"><span class="pre">ERR</span></code> handling.</p></li>
-<li><p><strong>Simulator:</strong> run the existing simulated-connection tests against every
-protocol with <code class="docutils literal notranslate"><span class="pre">pytest.mark.parametrize</span></code>.</p></li>
+<li><p><strong>Simulator (done):</strong> the existing simulator tests still pass on 2.106;
+new tests run every simulated firmware, including <code class="docutils literal notranslate"><span class="pre">set_to_status()</span></code> from
+each firmware to each other one.</p></li>
 <li><p><strong>Hardware (done):</strong> the expected replies in the hardware tests depend on
 <code class="docutils literal notranslate"><span class="pre">con.protocol</span></code>: what <code class="docutils literal notranslate"><span class="pre">L</span></code> does to C and D (see <a class="reference internal" href="#behaviour-differences">Behaviour
 differences</a>), and modes above 13 and linking, which are expected
-failures on 2.106 only. All pass on the 2.131B box.
+failures on 2.106 only. A beta-settings test checks the new commands and
+the simulator’s assumptions with A and B kept at 0. All pass on the 2.131B
+box.
 <code class="docutils literal notranslate"><span class="pre">test_timeout</span></code> still needs a look: it uses a <code class="docutils literal notranslate"><span class="pre">con</span></code> it never creates, so
 it fails with an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> and is reported as an expected failure
 for the wrong reason.</p></li>
-<li><p><strong>Modes:</strong> every number in both mode tables resolves to the expected name,
+<li><p><strong>Modes (done):</strong> every number in both mode tables resolves to the expected name,
 and <code class="docutils literal notranslate"><span class="pre">set_mode_by_name(&quot;step&quot;)</span></code> sends <code class="docutils literal notranslate"><span class="pre">M12</span></code> on 2.106 and <code class="docutils literal notranslate"><span class="pre">M15</span></code> on beta
 firmware.</p></li>
 </ul>
@@ -625,8 +651,8 @@ changes yet.</p></li>
 <li><p><strong>Done.</strong> Wire <code class="docutils literal notranslate"><span class="pre">protocol=</span></code> and detection into <code class="docutils literal notranslate"><span class="pre">Estim2pyConnection</span></code>, switch
 <code class="docutils literal notranslate"><span class="pre">link()</span></code>/<code class="docutils literal notranslate"><span class="pre">unlink()</span></code> to <code class="docutils literal notranslate"><span class="pre">join_command()</span></code>, handle <code class="docutils literal notranslate"><span class="pre">ERR</span></code> and empty
 replies, and make the hardware tests protocol-aware.</p></li>
-<li><p>Add the beta-only methods, <code class="docutils literal notranslate"><span class="pre">get_bias()</span></code>/<code class="docutils literal notranslate"><span class="pre">set_bias()</span></code>, the remaining
-status changes, per-firmware mode tables and simulator support.</p></li>
+<li><p><strong>Done.</strong> Add the beta-only methods, <code class="docutils literal notranslate"><span class="pre">get_bias()</span></code>/<code class="docutils literal notranslate"><span class="pre">set_bias()</span></code>, the
+remaining status changes, per-firmware mode tables and simulator support.</p></li>
 <li><p>Update the user docs and release as 0.4.0 (new public API, nothing
 removed).</p></li>
 </ol>

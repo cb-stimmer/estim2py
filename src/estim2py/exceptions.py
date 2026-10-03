@@ -9,3 +9,7 @@ class Estim2pyError(Exception):
     def __str__(self):
         # This makes the error message very helpful in your logs
         return f"{self.args[0]} ({self.data if self.data else 'no data'})"
+
+
+class Estim2pyUnsupportedError(Estim2pyError):
+    """The connected firmware does not support the requested feature."""
