@@ -238,8 +238,9 @@ at 12–13, so the same <code class="docutils literal notranslate"><span class="
 </tr>
 </tbody>
 </table>
-<p>Cycle and Twist reuse Thrust’s C/D meanings and description for now. Flo has
-no description yet.</p>
+<p>Flo is a continuous mode: C controls the feel of channel A and D controls the
+feel of channel B. Cycle and Twist reuse Thrust’s C/D meanings and description
+for now.</p>
 </section>
 <section id="commands">
 <h3>Commands<a class="headerlink" href="#commands" title="Link to this heading">¶</a></h3>
@@ -534,7 +535,8 @@ and <code class="docutils literal notranslate"><span class="pre">set_mode_by_nam
 <p>Resolved:</p>
 <ul class="simple">
 <li><p>The 2.119B box ends replies with <code class="docutils literal notranslate"><span class="pre">\n</span></code>, like 2.106.</p></li>
-<li><p>The 2.119B mode list is known (see <a class="reference internal" href="#modes">Modes</a>).</p></li>
+<li><p>The 2.119B mode list is known (see <a class="reference internal" href="#modes">Modes</a>), including what C and D do in
+the new Flo mode.</p></li>
 <li><p>2.106 has no <code class="docutils literal notranslate"><span class="pre">V</span></code> command, so <code class="docutils literal notranslate"><span class="pre">version()</span></code> falls back to <code class="docutils literal notranslate"><span class="pre">get_status()</span></code>
 there.</p></li>
 </ul>
@@ -542,7 +544,6 @@ there.</p></li>
 <ul class="simple">
 <li><p>Does <code class="docutils literal notranslate"><span class="pre">J1</span></code>/<code class="docutils literal notranslate"><span class="pre">J0</span></code> fix the join problem that <code class="docutils literal notranslate"><span class="pre">link()</span></code> documents (“does not
 work on my box”)? To be tested on the 2.119B box.</p></li>
-<li><p>What does the new Flo mode do, and what do C and D control in it?</p></li>
 </ul>
 <p>Rollout, one pull request each:</p>
 <ol class="arabic simple">
