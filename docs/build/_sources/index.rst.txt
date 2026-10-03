@@ -11,3 +11,4 @@ Contents
 
    usage
    estim2py
+   protocol_design
